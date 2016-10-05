@@ -20,3 +20,4 @@ massY = list(map(str,massY))
 with open('INPUT.txt', 'a') as file:
 	file.writelines('\n'.join(massY))
 	file.close()
+	
