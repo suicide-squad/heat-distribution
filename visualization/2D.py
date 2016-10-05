@@ -9,7 +9,7 @@ file = open(path, 'r')
 
 pattern = re.compile('[A-Za-z]+=-?\d+')
 setting = { line.split('=')[0] : float(line.split('=')[1]) 
-			for line in file if pattern.match(line)}
+			for line in file if pattern.match(line) }
 
 file.close()
 
@@ -30,7 +30,11 @@ path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result", "
 yFinish = numpy.loadtxt(path)
 
 # Рисование графиков
-plt.plot(x, yStart)
-plt.plot(x, yFinish)
+plt.plot(x, yStart, label ='start time')
+plt.plot(x, yFinish, label ='end time')
+plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=2, mode="expand", borderaxespad=0.)
+plt.xlabel('x', fontsize=14)
+plt.ylabel('U(x)', fontsize=14)
 plt.grid(True) 
 plt.show() 
