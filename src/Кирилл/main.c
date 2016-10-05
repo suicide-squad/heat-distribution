@@ -7,7 +7,7 @@ int main() {
 
   int i, j;
   int sizeTime = 0;
-  unsigned char curTime, prevTime;
+  int curTime, prevTime;
 
   const int N = 2;
   double* U[N];
@@ -33,10 +33,10 @@ int main() {
   fscanf(fp,"TSTART=%lf\n", &tStart);
   fscanf(fp,"TFINISH=%lf\n", &tFinal);
   fscanf(fp,"dt=%lf\n", &dt);
-  fscanf(fp,"BC=%d\n", &check);
+  fscanf(fp,"BC=%hhu\n", &check);
 
   nX = 500;
-  sizeTime = (tFinal - tStart)/dt;
+  sizeTime = (int)((tFinal - tStart)/dt);
 
   printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n",xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
 

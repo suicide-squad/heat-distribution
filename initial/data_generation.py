@@ -16,6 +16,7 @@ massX = arange(xStart, xFinish, step, dtype = float)
 massY = [cos(x*pi) if -0.5 < x < 0.5 else 0 for x in massX]
 
 massY = list(map(str,massY))
+print (len(massY))
 
 with open('INPUT.txt', 'a') as file:
 	file.writelines('\n'.join(massY))
