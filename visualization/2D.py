@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import os
 import re
 
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "initial", "INPUT.txt"))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+									"..", "initial", "INPUT.txt"))
 file = open(path, 'r')
 
 pattern = re.compile('[A-Za-z]+=-?\d+')
@@ -26,7 +27,8 @@ pattern = re.compile('\d+\.?\d*e?[+-]?\d*')
 yStart = numpy.array([float(line) for line in file if pattern.match(line)])
 file.close()
 
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result", "PetrovResult.txt"))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+									"..", "result", "PetrovResult.txt"))
 yFinish = numpy.loadtxt(path)
 
 # Рисование графиков
