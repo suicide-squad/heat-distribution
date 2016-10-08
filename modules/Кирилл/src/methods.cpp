@@ -74,9 +74,7 @@ void Methods::run() {
       prevTime = (i + 1) % N;
 
       for (int j = 1; j < nX + 2; j++)
-        U[curTime][j] = (sigma * dt / (step * step)) * (U[prevTime][j + 1] -
-            2 * U[prevTime][j] + U[prevTime][j - 1]) + U[prevTime][j];
-
+        U[curTime][j] = calculation(prevTime, j);
       // Задание граничных условий
       if (check == 2) {
         U[curTime][0] = U[curTime][1];
@@ -95,3 +93,6 @@ void Methods::saveResult(char* filename) {
 
   fclose(fp);
 }
+
+//(sigma * dt / (step * step)) * (U[prevTime][j + 1] -
+// 2 * U[prevTime][j] + U[prevTime][j - 1]) + U[prevTime][j];

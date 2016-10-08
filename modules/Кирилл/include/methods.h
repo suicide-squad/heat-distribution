@@ -9,15 +9,13 @@ class Methods {
  public:
   Methods(char*);
 
-  ~Methods();
+  virtual ~Methods();
 
+  virtual double calculation(int t, int x) = 0;
   void run();
   void saveResult(char*);
 
  protected:
-
-
-
   static const int N = 2;
 
   double* U[N];

@@ -1,7 +1,7 @@
-#include "methods.h"
+#include "euler.h"
 
 int main() {
-  Methods m("./../../../initial/INPUT.txt");
+  Euler m("./../../../initial/INPUT.txt");
   m.run();
   m.saveResult("./../../../result/PetrovResult.txt");
 
