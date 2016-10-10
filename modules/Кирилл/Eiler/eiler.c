@@ -20,7 +20,7 @@ int main() {
   unsigned char check = 0;
   double step = 0.0;
 
-  if((fp=fopen("./../../../initial/INPUT.txt", "r")) == NULL) {
+  if((fp=fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     exit(-1);
   }
@@ -90,11 +90,11 @@ int main() {
 
   printf("finish!\n");
 
-  fp = fopen("./../../../result/PetrovResult.txt", "w");
+  fp = fopen("./../../../../result/PetrovEilerResult.txt", "w");
 
   // Вывод результатов
   for (j = 1; j < nX + 1; j++)
-    fprintf(fp, "%lf\n", U[sizeTime%2][j]);
+    fprintf(fp, "%.15le\n", U[sizeTime%2][j]);
 
   fclose(fp);
 
