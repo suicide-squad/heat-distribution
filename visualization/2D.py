@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import os
 import re
 
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "initial", "INPUT.txt"))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+									"..", "initial", "INPUT.txt"))
 file = open(path, 'r')
 
 pattern = re.compile('[A-Za-z]+=-?\d+')
