@@ -52,8 +52,6 @@ int main(int argc, char** argv) {
 
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
-    FILE *allData = fopen("AllStatistic.txt", "w");
-
     prevTime = 0;
     currTime = 1;
 
@@ -71,11 +69,6 @@ int main(int argc, char** argv) {
         // boundary conditions
         vect[currTime][0] = vect[currTime][1];
         vect[currTime][nX+1] = vect[currTime][nX];
-
-        for (int i = 0; i <= nX + 1; i++) {
-            fprintf(allData, "%lf\t", vect[currTime][i]);
-        }
-        fprintf(allData, "\n");
 
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
