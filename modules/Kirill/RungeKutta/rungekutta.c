@@ -5,7 +5,7 @@
 int main() {
   FILE *fp;
 
-  int i, j;
+  int t, x;
   int sizeTime = 0;
   int curTime, prevTime;
 
@@ -35,13 +35,12 @@ int main() {
   fscanf(fp,"dt=%lf\n", &dt);
   fscanf(fp,"BC=%hhu\n", &check);
 
-  nX = 500;
   sizeTime = (int)((tFinal - tStart)/dt);
 
   printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n",xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
 
-  for (i = 0; i < N; i++) {
-    U[i] = (double *)malloc((nX + 2)*sizeof(double));
+  for (x = 0; x < N; x++) {
+    U[x] = (double *)malloc((nX + 2)*sizeof(double));
   }
 
   //  Вычисление шага по x
@@ -53,8 +52,8 @@ int main() {
   }
 
   // Заполнение функции в нулевой момент времени
-  for (i = 1; i < nX -1; i++) {
-    fscanf(fp, "%lf", &U[0][i]);
+  for (x = 1; x < nX -1; x++) {
+    fscanf(fp, "%lf", &U[0][x]);
   }
 
   fclose(fp);
@@ -68,14 +67,46 @@ int main() {
     printf("HZ");
   }
 
-  // Заполнение сетки
-  for (i = 1; i <= sizeTime; i++) {
-    curTime = i%N;
-    prevTime = (i + 1)%N;
+  double* k1 =  (double *)malloc((nX + 2)*sizeof(double));
+  double* k2 =  (double *)malloc((nX + 2)*sizeof(double));
+  double* k3 =  (double *)malloc((nX + 2)*sizeof(double));
+  double* k4 =  (double *)malloc((nX + 2)*sizeof(double));
 
-    for (j = 1; j < nX + 2; j++)
-      U[curTime][j] = (sigma*dt/(step*step))*(U[prevTime][j + 1] -
-                       2*U[prevTime][j] + U[prevTime][j - 1]) + U[prevTime][j];
+  // Заполнение сетки
+  for (t = 1; t <= sizeTime; t++) {
+    curTime = t%N;
+    prevTime = (t + 1)%N;
+
+    // Вычисление ki в данный момент времени
+    for (x = 1; x < nX + 2; x++)
+      k1[x] = (U[prevTime][x + 1] - 2 * U[prevTime][x] + U[prevTime][x - 1]) / (step * step);
+
+    k1[0] = k1[1];
+    k1[nX-2] = k1[nX-1];
+
+    for (x = 1; x < nX + 2; x++)
+      k2[x] = (U[prevTime][x + 1] + k1[x + 1]*dt*0.5 - 2*U[prevTime][x] - k1[x]*dt + U[prevTime][x - 1]
+          + k1[x - 1]*dt*0.5)/(step*step);
+
+    k2[0] = k2[1];
+    k2[nX-2] = k2[nX-1];
+
+    for (x = 1; x < nX + 2; x++)
+      k3[x] = (U[prevTime][x + 1] + k2[x + 1]*dt*0.5 - 2*U[prevTime][x] - k2[x]*dt + U[prevTime][x - 1] +
+          k2[x - 1]*dt*0.5)/(step*step);
+
+    k3[0] = k3[1];
+    k3[nX-2] = k3[nX-1];
+
+    for (x = 1; x < nX + 2; x++)
+      k4[x] = (U[prevTime][x + 1] + k3[x + 1]*dt - 2*U[prevTime][x] - k3[x]*dt*2 + U[prevTime][x - 1] +
+          k3[x - 1]*dt)/(step*step);
+
+    k4[0] = k4[1];
+    k4[nX-2] = k4[nX-1];
+
+    for (x = 1; x < nX + 2; x++)
+      U[curTime][x] = U[prevTime][x] + (k1[x] + 2 * k2[x] + 2 * k3[x] + k4[x])*dt/ 6;
 
     // Задание граничных условий
     if (check == 2) {
@@ -90,17 +121,17 @@ int main() {
 
   printf("finish!\n");
 
-  fp = fopen("./../../../../result/PetrovEilerResult.txt", "w");
+  fp = fopen("./../../../../result/kirillRungeKutta.txt", "w");
 
   // Вывод результатов
-  for (j = 1; j < nX + 1; j++)
-    fprintf(fp, "%.15le\n", U[sizeTime%2][j]);
+  for (x = 1; x < nX + 1; x++)
+    fprintf(fp, "%.15le\n", U[sizeTime%2][x]);
 
   fclose(fp);
 
   // Чистка мусора
-  for (i = 0; i < 2; i++) {
-    free(U[i]);
+  for (t = 0; t < 2; t++) {
+    free(U[t]);
   }
 
   return 0;
