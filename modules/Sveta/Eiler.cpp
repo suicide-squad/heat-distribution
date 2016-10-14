@@ -34,7 +34,7 @@ int main() {
     fscanf(fp, "XSTART=%lf\n", &xStart);
     fscanf(fp, "XEND=%lf\n", &xEnd);
     fscanf(fp, "SIGMA=%lf\n", &sigma);
-    fscanf(fp, "NX=%d\n", &nX); // Не читает!?
+    fscanf(fp, "NX=%d\n", &nX); 
     fscanf(fp, "TSTART=%lf\n", &tStart);
     fscanf(fp, "TFINISH=%lf\n", &tFinal);
     fscanf(fp, "dt=%lf\n", &dt);
@@ -52,7 +52,7 @@ int main() {
     //  Вычисление шага по x
     step = fabs(xStart - xEnd) / nX;
 
-    if (2 * sigma*dt > step*step) {
+    if (2 * dt*sigma > step*step) {
         printf("Not correct step!");
         exit(-1);
     }
@@ -80,8 +80,8 @@ int main() {
         prevTime = (i + 1) % N;
 
         for (j = 1; j < nX + 2; j++)
-            U[curTime][j] = (sigma*dt / (step*step))*(U[prevTime][j + 1] -
-            2 * U[prevTime][j] + U[prevTime][j - 1]) + U[prevTime][j];
+            U[curTime][j] = (dt*sigma / (step*step))*(U[prevTime][j - 1] -
+            2 * U[prevTime][j] + U[prevTime][j + 1]) + U[prevTime][j];
 
         // Задание граничных условий
         if (check == 2) {
@@ -90,14 +90,14 @@ int main() {
         }
         else if (check == 1) {
             // ???
-            printf("HZ");
+            printf("oj vse");
         }
 
     }
 
     printf("finish!\n");
 
-    fp = fopen("C:\\Users\\ролд\\Documents\\Visual Studio 2013\\Projects\\Eiler\\Eiler\\OUTPUT.txt", "w");
+    fp = fopen("C:\\Users\\ролд\\Documents\\Visual Studio 2013\\Projects\\Eiler\\Eiler\\OUTPUT_gonch.txt", "w");
 
     // Вывод результатов
     for (j = 1; j < nX + 1; j++)
