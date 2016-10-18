@@ -58,11 +58,11 @@ int main(int argc, char** argv) {
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
 
+    double expression = sigma * dt / step * step;
 
     for (double j = 0; j < tFinal; j += dt) {
         for (int i = 1; i <= nX; i++) {
-            vect[currTime][i] = ((sigma * dt) / (step * step)) *
-                                (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
+            vect[currTime][i] = expression * (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
                                 + vect[prevTime][i];
         }
 
