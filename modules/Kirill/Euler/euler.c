@@ -8,8 +8,6 @@
 int main() {
   FILE *fp;
 
-  int parallel = 1;
-
   int sizeTime = 0;
   int curTime, prevTime;
 
@@ -22,7 +20,7 @@ int main() {
   double tStart = 0.0, tFinal = 0.0;
   double dt = 0.0;
   unsigned char check = 0;
-  double step = 0.0;
+  double step;
 
   if((fp=fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
@@ -39,7 +37,6 @@ int main() {
   fscanf(fp,"dt=%lf\n", &dt);
   fscanf(fp,"BC=%hhu\n", &check);
 
-  nX = 500;
   sizeTime = (int)((tFinal - tStart)/dt);
 
   printf("XSTART=%lf; XEND=%lf; SIGMA=%lf; NX=%d; TSTART=%lf;"" TFINISH=%lf;"" dt=%lf; BC=%d;\n",
@@ -79,12 +76,12 @@ int main() {
   double factor = sigma*dt/(step*step);
 
   double t0 = omp_get_wtime();
-  for (int i = 1; i <= sizeTime; i++) {
-    curTime = i%N;
-    prevTime = (i + 1)%N;
+  #pragma omp parallel if (ENABLE_PARALLEL)
+  {
+    for (int i = 1; i <= sizeTime; i++) {
+      curTime = i % N;
+      prevTime = (i + 1) % N;
 
-    #pragma omp parallel if (ENABLE_PARALLEL)
-    {
       int j;
       #pragma omp for
       for (j = 1; j < nX + 2; j++)
@@ -99,7 +96,6 @@ int main() {
         printf("HZ");
       }
     }
-
   }
   double t1 = omp_get_wtime();
 
