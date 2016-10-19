@@ -27,15 +27,14 @@ pattern = re.compile('\d+\.?\d*e?[+-]?\d*')
 yStart = numpy.array([float(line) for line in file if pattern.match(line)])
 file.close()
 
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result","sergeyEuler.txt"))
-path2 = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result","kirillEuler.txt"))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result","kirillEuler.txt"))
 yFinish = numpy.loadtxt(path)
-y2= numpy.loadtxt(path2)
+
 
 # Рисование графиков
 plt.plot(x, yStart, label ='start time')
 plt.plot(x, yFinish, label ='end time')
-plt.plot(x, y2, label ='kirill')
+
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
 plt.xlabel('x', fontsize=14)
