@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
+#include <omp.h>
+
+#define ENABLE_PARALLEL 0
 
 int main() {
   FILE *fp;
 
-  int i, j;
+  int parallel = 1;
+
   int sizeTime = 0;
   int curTime, prevTime;
 
@@ -39,9 +42,10 @@ int main() {
   nX = 500;
   sizeTime = (int)((tFinal - tStart)/dt);
 
-  printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n",xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
+  printf("XSTART=%lf; XEND=%lf; SIGMA=%lf; NX=%d; TSTART=%lf;"" TFINISH=%lf;"" dt=%lf; BC=%d;\n",
+         xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
 
-  for (i = 0; i < N; i++) {
+  for (int i = 0; i < N; i++) {
     U[i] = (double *)malloc((nX + 2)*sizeof(double));
   }
 
@@ -54,7 +58,7 @@ int main() {
   }
 
   // Заполнение функции в нулевой момент времени
-  for (i = 1; i < nX -1; i++) {
+  for (int i = 1; i < nX -1; i++) {
     fscanf(fp, "%lf", &U[0][i]);
   }
 
@@ -74,39 +78,44 @@ int main() {
 
   double factor = sigma*dt/(step*step);
 
-  clock_t t0 = clock();
-  for (i = 1; i <= sizeTime; i++) {
+  double t0 = omp_get_wtime();
+  for (int i = 1; i <= sizeTime; i++) {
     curTime = i%N;
     prevTime = (i + 1)%N;
 
-    for (j = 1; j < nX + 2; j++)
-      U[curTime][j] = factor*(U[prevTime][j + 1] - 2*U[prevTime][j] +
-                      U[prevTime][j - 1]) + U[prevTime][j];
+    #pragma omp parallel if (ENABLE_PARALLEL)
+    {
+      int j;
+      #pragma omp for
+      for (j = 1; j < nX + 2; j++)
+        U[curTime][j] = factor * (U[prevTime][j + 1] - 2.0 * U[prevTime][j] +
+            U[prevTime][j - 1]) + U[prevTime][j];
 
-    // Задание граничных условий
-    if (check == 2) {
-      U[curTime][0] = U[curTime][1];
-      U[curTime][nX - 1] = U[curTime][nX -2];
-    } else if (check == 1) {
-      printf("HZ");
+      // Задание граничных условий
+      if (check == 2) {
+        U[curTime][0] = U[curTime][1];
+        U[curTime][nX - 1] = U[curTime][nX - 2];
+      } else if (check == 1) {
+        printf("HZ");
+      }
     }
 
   }
-  clock_t t1 = clock();
+  double t1 = omp_get_wtime();
 
   printf("finish!\n");
-  printf("time run %ld\n", t1-t0);
+  printf("time run %.15lf\n", t1-t0);
 
   fp = fopen("./../../../../result/kirillEuler.txt", "w");
 
   // Вывод результатов
-  for (j = 1; j < nX + 1; j++)
+  for (int j = 1; j < nX + 1; j++)
     fprintf(fp, "%.15le\n", U[sizeTime%2][j]);
 
   fclose(fp);
 
   // Чистка мусора
-  for (i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++) {
     free(U[i]);
   }
 
