@@ -1,6 +1,6 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 int main() {
   FILE *fp;
@@ -69,20 +69,22 @@ int main() {
   }
 
   // Заполнение сетки
+  // ОСНОВНЫЕ ВЫЧИСЛЕНИЯ
+
+  double factor = sigma*dt/(step*step);
   for (i = 1; i <= sizeTime; i++) {
     curTime = i%N;
     prevTime = (i + 1)%N;
 
     for (j = 1; j < nX + 2; j++)
-      U[curTime][j] = (sigma*dt/(step*step))*(U[prevTime][j + 1] -
-                       2*U[prevTime][j] + U[prevTime][j - 1]) + U[prevTime][j];
+      U[curTime][j] = factor*(U[prevTime][j + 1] - 2*U[prevTime][j] +
+                      U[prevTime][j - 1]) + U[prevTime][j];
 
     // Задание граничных условий
     if (check == 2) {
       U[curTime][0] = U[curTime][1];
       U[curTime][nX - 1] = U[curTime][nX -2];
     } else if (check == 1) {
-      // ???
       printf("HZ");
     }
 
