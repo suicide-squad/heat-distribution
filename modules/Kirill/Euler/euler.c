@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 int main() {
   FILE *fp;
@@ -72,6 +73,8 @@ int main() {
   // ОСНОВНЫЕ ВЫЧИСЛЕНИЯ
 
   double factor = sigma*dt/(step*step);
+
+  clock_t t0 = clock();
   for (i = 1; i <= sizeTime; i++) {
     curTime = i%N;
     prevTime = (i + 1)%N;
@@ -89,8 +92,10 @@ int main() {
     }
 
   }
+  clock_t t1 = clock();
 
   printf("finish!\n");
+  printf("time run %ld\n", t1-t0);
 
   fp = fopen("./../../../../result/kirillEuler.txt", "w");
 
