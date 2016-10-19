@@ -27,12 +27,14 @@ pattern = re.compile('\d+\.?\d*e?[+-]?\d*')
 yStart = numpy.array([float(line) for line in file if pattern.match(line)])
 file.close()
 
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result", "PetrovRungeKuttaResult.txt"))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result","kirillEuler.txt"))
 yFinish = numpy.loadtxt(path)
+
 
 # Рисование графиков
 plt.plot(x, yStart, label ='start time')
 plt.plot(x, yFinish, label ='end time')
+
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
 plt.xlabel('x', fontsize=14)
