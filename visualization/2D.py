@@ -30,7 +30,9 @@ file.close()
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result","kirillEuler.txt"))
 yFinish = numpy.loadtxt(path)
 
-
+print(len(yFinish))
+print(len(x))
+print(len(yStart))
 # Рисование графиков
 plt.plot(x, yStart, label ='start time')
 plt.plot(x, yFinish, label ='end time')
