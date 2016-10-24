@@ -1,6 +1,7 @@
 #include "sparse_matrix.h"
 
 #include <algorithm>
+#include <omp.h>
 
 SpareMatrix::SpareMatrix(TYPE* value, int* col, int* rowIndex, const int nz, const int nRows) {
   nz_ = nz;
@@ -19,3 +20,16 @@ SpareMatrix::~SpareMatrix() {
   delete[] rowIndex_;
 }
 
+TYPE*& SpareMatrix::operator*(TYPE* vector) {
+  TYPE* result = new TYPE[nRows_];
+  TYPE localSum;
+//  #pragma omp parallel for nowait private(localSum)
+  for (int i = 0; i < nRows_; i++) {
+    localSum = 0;
+    for (int j = rowIndex_[i]; j < rowIndex_[i + 1]; j++)
+      localSum += value_[j] * vector[col_[j]];
+    result[i] = localSum;
+
+  }
+  return result;
+}

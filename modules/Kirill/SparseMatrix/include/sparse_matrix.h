@@ -8,14 +8,14 @@
 
 // CSR (Compressed Sparse Rows)
 
-#include <vector>
-
 typedef double TYPE;
 
 class SpareMatrix {
  public:
   explicit SpareMatrix(TYPE*, int*, int*, const int, const int);
   ~SpareMatrix();
+  TYPE*& operator*(TYPE *);
+
 
  private:
   TYPE* value_;   // Элементы матрицы
