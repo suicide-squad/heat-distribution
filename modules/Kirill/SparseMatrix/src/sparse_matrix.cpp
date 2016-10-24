@@ -1,9 +1,8 @@
 #include "sparse_matrix.h"
 
-#include <algorithm>
 #include <omp.h>
 
-SpareMatrix::SpareMatrix(TYPE* value, int* col, int* rowIndex, const int nz, const int nRows) {
+SpareMatrix::SpareMatrix(TYPE* value, int* col, int* rowIndex, const size_t nz, const size_t nRows) {
   nz_ = nz;
   nRows_ = nRows;
   value_ = new TYPE[nz_];

@@ -6,6 +6,7 @@
 #define SPARSE_SPARSE_H
 
 #include <vector>
+#include <algorithm>
 
 typedef double TYPE;
 typedef std::vector<TYPE> vector;
@@ -14,7 +15,7 @@ typedef std::vector<TYPE> vector;
 
 class SpareMatrix {
  public:
-  explicit SpareMatrix(TYPE*, int*, int*, const int, const int);
+  explicit SpareMatrix(TYPE*, int*, int*, const size_t , const size_t);
   ~SpareMatrix();
   vector operator*(const vector&);
 
@@ -23,8 +24,8 @@ class SpareMatrix {
   TYPE* value_;   // Элементы матрицы
   int* col_;      // Номера столбцов для каждого элемента
   int* rowIndex_; // Место каждого ненулевого элемента в каждой строке
-  int nz_;        // Количество ненулевых
-  int nRows_;     // Количество строк
+  size_t nz_;        // Количество ненулевых
+  size_t nRows_;     // Количество строк
 };
 
 
