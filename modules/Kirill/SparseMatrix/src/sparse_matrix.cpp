@@ -20,14 +20,14 @@ SpareMatrix::~SpareMatrix() {
   delete[] rowIndex_;
 }
 
-TYPE*& SpareMatrix::operator*(TYPE* vector) {
-  TYPE* result = new TYPE[nRows_];
+vector SpareMatrix::operator*(const vector& v) {
+  vector result(nRows_);
   TYPE localSum;
 //  #pragma omp parallel for nowait private(localSum)
   for (int i = 0; i < nRows_; i++) {
     localSum = 0;
     for (int j = rowIndex_[i]; j < rowIndex_[i + 1]; j++)
-      localSum += value_[j] * vector[col_[j]];
+      localSum += value_[j] * v[col_[j]];
     result[i] = localSum;
 
   }
