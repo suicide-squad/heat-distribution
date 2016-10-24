@@ -5,9 +5,24 @@
 #ifndef SPARSE_SPARSE_H
 #define SPARSE_SPARSE_H
 
+
+// CSR (Compressed Sparse Rows)
+
+#include <vector>
+
+typedef double TYPE;
+
 class SpareMatrix {
  public:
-  explicit SpareMatrix();
+  explicit SpareMatrix(TYPE*, int*, int*, const int, const int);
+  ~SpareMatrix();
+
+ private:
+  TYPE* value_;   // Элементы матрицы
+  int* col_;      // Номера столбцов для каждого элемента
+  int* rowIndex_; // Место каждого ненулевого элемента в каждой строке
+  int nz_;        // Количество ненулевых
+  int nRows_;     // Количество строк
 };
 
 
