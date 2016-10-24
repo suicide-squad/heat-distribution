@@ -4,7 +4,7 @@
 #include <omp.h>
 
 // OpenMP 4.0
-#define ENABLE_PARALLEL 1
+#define ENABLE_PARALLEL 0
 
 int main() {
   FILE *fp;
@@ -23,6 +23,10 @@ int main() {
   unsigned char check = 0;
   double step;
 
+  //------------------------------------------------------------------------
+  // ИНИЦИАЛИЗАЦИЯ И ЧТЕНИЕ ДАННЫХ
+  //------------------------------------------------------------------------
+
   if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     exit(-1);
@@ -32,7 +36,7 @@ int main() {
   fscanf(fp, "XSTART=%lf\n", &xStart);
   fscanf(fp, "XEND=%lf\n", &xEnd);
   fscanf(fp, "SIGMA=%lf\n", &sigma);
-  fscanf(fp, "NX=%d\n", &nX); // Не читает!?
+  fscanf(fp, "NX=%d\n", &nX);
   fscanf(fp, "TSTART=%lf\n", &tStart);
   fscanf(fp, "TFINISH=%lf\n", &tFinal);
   fscanf(fp, "dt=%lf\n", &dt);
@@ -74,36 +78,40 @@ int main() {
     printf("HZ");
   }
 
+  //------------------------------------------------------------------------
   // Заполнение сетки
   // ОСНОВНЫЕ ВЫЧИСЛЕНИЯ
+  //------------------------------------------------------------------------
 
   double factor = sigma * dt / (step * step);
 
   int j;
   double t0 = omp_get_wtime();
-
-  #pragma omp parallel private(j) if (ENABLE_PARALLEL)
-  {
     for (int i = 1; i <= sizeTime; i++) {
       curTime = i % N;
       prevTime = (i + 1) % N;
 
-      #pragma omp for nowait
-      for (j = 1; j < nX + 2; j++) {
-        U[curTime][j] = factor * (U[prevTime][j + 1] - 2.0 * U[prevTime][j] +
-            U[prevTime][j - 1]) + U[prevTime][j];
-      }
 
-      // Задание граничных условий
+      #pragma parallel omp num_threads(2) if (ENABLE_PARALLEL)
+      {
+        #pragma omp for nowait
+        for (j = 1; j < nX + 2; j++)
+          U[curTime][j] = factor * (U[prevTime][j + 1] - 2.0 * U[prevTime][j] +
+              U[prevTime][j - 1]) + U[prevTime][j];
+      }
+        // Задание граничных условий
       if (check == 2) {
         U[curTime][0] = U[curTime][1];
         U[curTime][nX - 1] = U[curTime][nX - 2];
       } else if (check == 1) {
         printf("HZ");
       }
-    } // for
-  } //parallel
+    }
   double t1 = omp_get_wtime();
+
+  //------------------------------------------------------------------------
+  // ВЫВОД РЕЗУЬТАТОВ И ЧИСТКА МУСОРА
+  //------------------------------------------------------------------------
 
   double diffTime = t1-t0;
   printf("finish!\n");
