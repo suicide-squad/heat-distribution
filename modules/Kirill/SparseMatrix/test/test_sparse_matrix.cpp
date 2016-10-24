@@ -25,14 +25,14 @@ TEST(can_mult_matrix_and_vector, SpareMatrix) {
   int rowIndex[] = {0, 2, 4, 4, 6, 6, 9};
   SpareMatrix s(value, col, rowIndex, 9, 6);
 
-  TYPE vect[N] = {1, 2, 4, 1, 0, 3};
+  vector v = {1, 2, 4, 1, 0, 3};
 
   // Act
-  TYPE* res = s*vect;
+  vector res = s*v;
 
   // Assert
-  TYPE expected_vect[N] = {1, 16, 0, 23, 0, 36};
-  EXPECT_TRUE(std::equal(res, res + N, expected_vect, expected_vect + N));
+  vector expected_v = {1, 16, 0, 23, 0, 36};
+  EXPECT_EQ(expected_v, res);
 }
 
 TEST(can_mult_matrix_m_n_and_vector, SpareMatrix) {
@@ -45,14 +45,14 @@ TEST(can_mult_matrix_m_n_and_vector, SpareMatrix) {
   int rowIndex[m + 1] = {0, 1, 3, 3, 4, 6};
   SpareMatrix s(value, col, rowIndex, nz, m);
 
-  TYPE vect[n] = {1, 2, 0, 1};
+  vector v = {1, 2, 0, 1};
 
   // Act
-  TYPE* res = s*vect;
+  vector res = s*v;
 
   // Assert
-  TYPE expected_vect[m] = {3, 6, 0, 1, 2};
-  EXPECT_TRUE(std::equal(res, res + m, expected_vect, expected_vect + m));
+  vector expected_v = {3, 6, 0, 1, 2};
+  EXPECT_EQ(expected_v, res);
 }
 
 
