@@ -34,11 +34,40 @@ int main() {
     return -1;
   }
 
-  printf("%d",sizeTime);
+  double h = sigma*dt/(step*step);
+  double* UNext = new double [nX + 2];
 
+  double* val = new double[nX*3 + 2];
+  int* col = new int[nX*3 + 2];
+  int* rowI = new int[nX + 2 + 1];
+
+
+  // Заполнение значений и номера столбцов матрицы
+  val[0] = 1; col[0] = 0;
+  int j = 0;
+  for (int i = 1; i < 3*nX + 1; i+=3) {
+    val[i] = h; col[i] = j++;
+    val[i + 1] = 1 - 2*h; col[i + 1] = j++;
+    val[i + 2] = h; col[i + 2] = j--;
+  }
+  val[nX*3 + 1] = 1; col[3*nX + 1] = nX + 1;
+
+  rowI[0] = 0;
+  rowI[1] = 1;
+  for (int i = 2; i < nX + 2; i++)
+    rowI[i] = rowI[i - 1] + 3;
+  rowI[nX + 2] = rowI[nX + 1] + 1;
+
+  // TEST
+//  printf("h = %.4lf\n",h);
+//  for (int i = 0; i < nX + 3; i++)
+//    printf("%d\n", rowI[i]);
+
+  SpareMatrix A(val, col, rowI, nX*3 + 2, nX + 2);
+  UNext = A * U;
 
   //  чистка и вывод результатов
-  final(nX, U);
+  final(nX, UNext);
   return 0;
 
 }
