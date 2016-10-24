@@ -5,14 +5,17 @@
 #ifndef SPARSE_SPARSE_H
 #define SPARSE_SPARSE_H
 
+#include <omp.h>
+
 #include <vector>
 #include <algorithm>
 
 typedef double TYPE;
 typedef std::vector<TYPE> vector;
 
-// CSR (Compressed Sparse Rows)
+#define ENABLE_PARALLEL 1
 
+// CSR (Compressed Sparse Rows)
 class SpareMatrix {
  public:
   explicit SpareMatrix(TYPE*, int*, int*, const size_t , const size_t);
