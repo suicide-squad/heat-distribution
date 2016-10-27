@@ -11,7 +11,27 @@
 #include <algorithm>
 
 typedef double TYPE;
-typedef std::vector<TYPE> vector;
+
+class vector : public std::vector<TYPE> {
+ public:
+  vector(size_t size) : std::vector<TYPE>(size) {}
+  vector() : std::vector<TYPE>() {}
+  vector(std::initializer_list<TYPE> list) : std::vector<TYPE>(list) {}
+  vector operator+ (const vector& b) {
+    vector result(size());
+    for (int i = 0; i < size(); ++i)
+      result[i] = this->at(i) +
+          b[i];
+    return result;
+  }
+
+  vector operator* (const TYPE b) {
+    vector result(size());
+    for (int i = 0; i < size(); ++i)
+      result[i] = this->at(i)*b;
+    return result;
+  }
+};
 
 #define ENABLE_PARALLEL 1
 

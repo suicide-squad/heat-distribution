@@ -55,4 +55,29 @@ TEST(can_mult_matrix_m_n_and_vector, SpareMatrix) {
   EXPECT_EQ(expected_v, res);
 }
 
+TEST(can_add_vectors, vector) {
+  // Arrange
+  vector v1 = {1, 2, 0, 1};
+  vector v2 = {4, 5, 7, 1};
 
+  // Act
+  vector res = v1 + v2;
+
+  // Assert
+  vector expected_v = {5, 7, 7, 2};
+  EXPECT_EQ(expected_v, res);
+}
+
+
+TEST(can_mult_vectors_and_number, vector) {
+  // Arrange
+  vector v = {1, 2, 0, 1};
+  TYPE d = 3;
+
+  // Act
+  vector res = v * d;
+
+  // Assert
+  vector expected_v = {3, 6, 0, 3};
+  EXPECT_EQ(expected_v, res);
+}
