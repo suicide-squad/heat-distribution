@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
     double* k4Vect = new double[nX + 2];
 
     double expression = sigma / (step * step);
-    FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
+    //FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
 
     for (double j = 0; j < tFinal; j += dt) {
         // Fill k1 vect
@@ -106,9 +106,9 @@ int main(int argc, char** argv) {
         // FIll result vector
         for (int i = 1; i <= nX; i++) {
             vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2*k2Vect[i] + 2*k3Vect[i] + k4Vect[i]));
-            fprintf(outfile, "%2.15le\t", vect[currTime][i]);
+            //fprintf(outfile, "%2.15le\t", vect[currTime][i]);
         }
-        fprintf(outfile, "\n");
+//        fprintf(outfile, "\n");
 
         // boundary conditions
         vect[currTime][0] = vect[currTime][1];
@@ -119,9 +119,10 @@ int main(int argc, char** argv) {
         currTime = (currTime + 1) % 2;
     }
 
-    //FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
+    FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
 
-   /* for (int i = 1; i <= nX; i++) {
+    for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
-    }*/
+    }
+
 }
