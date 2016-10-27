@@ -47,6 +47,7 @@ int main() {
   printf("XSTART=%lf; XEND=%lf; SIGMA=%lf; NX=%d; TSTART=%lf;"
              " TFINISH=%lf;"" dt=%lf; BC=%d;\n",
          xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
+  printf("TIMESIZE = %d; NX = %d\n", sizeTime, nX);
 
   for (int i = 0; i < N; i++) {
     U[i] = (double *) malloc((nX + 2) * sizeof(double));
