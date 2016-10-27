@@ -9,7 +9,8 @@
 using std::vector;
 
 class SparseMatrix {
-    vector<double> values = new vector<double >;
+private:
+    vector<double> values;
     vector<double> colums;
     vector<double> pointerB;
     vector<double> pointerE;
@@ -19,6 +20,8 @@ class SparseMatrix {
     double* pointerB = nullptr;
     double* pointerE = nullptr;
     */
+public:
+    SparseMatrix() {};
     SparseMatrix(double** &matrix, int widthSize, int heightSize);
     SparseMatrix(double* &matrix, int size);
 };

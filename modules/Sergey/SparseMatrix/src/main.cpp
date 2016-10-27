@@ -4,11 +4,10 @@
 
 #include <iostream>
 #include <cmath>
-
+#include "SparseMatrix.h"
 using std::string;
 
-int main(int argc, char** argv) {
-    string filename = "INPUT.txt";
+void fillMatrix(double** &matrix, string filename, int &size) {
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -16,7 +15,35 @@ int main(int argc, char** argv) {
         exit(0);
     }
 
-    double xStart = 0.0, xEnd = 0.0;
+    // Scan size of matrix.
+    fscanf(infile, "size=%d", &size);
+    if (size == 0 || size < 0) {
+        printf("Error, wrong size");
+        exit(0);
+    }
+
+    matrix = new double*[size];
+    for (int i = 0; i < size; ++i) {
+        matrix[i] = new double[size];
+        for (int j = 0; j < size; ++j) {
+            fscanf(infile, "%lf", &matrix[i][j]);
+        }
+    }
+    fclose(infile);
+}
+
+int main(int argc, char** argv) {
+    double** original_matrix = nullptr;
+    int matrixSize = 0;
+
+    string filename = "INPUT.txt";
+    fillMatrix(original_matrix, filename, matrixSize);
+
+    SparseMatrix matrix(original_matrix, matrixSize, matrixSize);
+
+
+
+    /*double xStart = 0.0, xEnd = 0.0;
     double sigma = 0.0;
 
     int bc = 0; // Not use
@@ -83,5 +110,5 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
-    }
+    }*/
 }

@@ -4,7 +4,7 @@
 
 #include "SparseMatrix.h"
 
-SparseMatrix::SparseMatrix(double **&matrix, int widthSize, int heightSize) {
+SparseMatrix::SparseMatrix(double** &matrix, int widthSize, int heightSize) {
     int valuesCounter = 0;
     for (int i = 0; i < heightSize; ++i ) {
         for (int j = 0; j < widthSize; ++j) {
