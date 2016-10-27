@@ -36,12 +36,12 @@ int main(int argc, char** argv) {
     double** original_matrix = nullptr;
     int matrixSize = 0;
 
-    string filename = "INPUT.txt";
+    string filename = "Input.txt";
     fillMatrix(original_matrix, filename, matrixSize);
 
     SparseMatrix matrix;
     matrix.fillMatrix(original_matrix, matrixSize, matrixSize);
-
+    matrix.printVectors();
 
 
     /*double xStart = 0.0, xEnd = 0.0;

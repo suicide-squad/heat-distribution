@@ -5,15 +5,16 @@
 #ifndef SPARSEMATRIX_SPARSEMATRIX_H
 #define SPARSEMATRIX_SPARSEMATRIX_H
 #include <vector>
+#include <algorithm>
 
 using std::vector;
 
 class SparseMatrix {
 private:
     vector<double> values;
-    vector<double> colums;
-    vector<double> pointerB;
-    vector<double> pointerE;
+    vector<int> colums;
+    vector<int> pointerB;
+    vector<int> pointerE;
     /*
     double* values = nullptr;
     double* columns = nullptr;
@@ -22,10 +23,11 @@ private:
     */
 public:
     SparseMatrix() {};
-    SparseMatrix(double** &matrix, int widthSize, int heightSize);
-    SparseMatrix(double* &matrix, int size);
+    //SparseMatrix(double** &matrix, int widthSize, int heightSize);
+    //SparseMatrix(double* &matrix, int size);
 
     void fillMatrix(double** &matrix, int widthSize, int heightSize);
+    void printVectors();
 };
 
 

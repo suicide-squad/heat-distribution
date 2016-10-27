@@ -4,31 +4,49 @@
 
 #include "SparseMatrix.h"
 
-SparseMatrix::SparseMatrix(double** &matrix, int widthSize, int heightSize) {
-}
 
 void SparseMatrix::fillMatrix(double** &matrix, int widthSize, int heightSize) {
     int valuesCounter = 0;
-    for (int i = 0; i < heightSize; ++i ) {
-        for (int j = 0; j < widthSize; ++j) {
+    for (int i = 0; i < heightSize; ++i ) { // line
+
+        for (int j = 0; j < widthSize; ++j) {   // collumn
             if (matrix[i][j]!= 0 ) {
                 values.push_back(matrix[i][j]);
                 valuesCounter++;
-                if (colums.empty()) {
-                    pointerB.push_back(valuesCounter);
-                } else {
+
+                if (pointerB.empty()) {
+                    pointerB.push_back(j + i*j);
+                } else if (pointerB.size() == i) {
                     pointerB.push_back(valuesCounter + pointerB[0] - 1);
                 }
-                colums.push_back(i);
+                colums.push_back(j);
             }
-
         }
-        if (i == 1) {
-            pointerE.push_back(valuesCounter);
-            /*} else if (i = heightSize - 1 ) {
-                pointerE.push_back(valuesCounter);*/
-        } else {
-            pointerE.push_back(valuesCounter + pointerE[0] - 1);
+        if (pointerE.empty()) {
+            pointerE.push_back(valuesCounter + 1);
+        } else if (pointerE.size() == i) {
+            pointerE.push_back(valuesCounter + 1);
         }
     }
+}
+
+void SparseMatrix::printVectors() {
+    printf("values\n");
+    for (auto x : values)
+        printf("%lf ", x);
+    printf("\n");
+
+    printf("colums\n");
+    for (auto x : colums)
+        printf("%d ", x);
+    printf("\n");
+
+    printf("pointerB\n");
+    for (auto x : pointerB)
+        printf("%d ", x);
+    printf("\n");
+
+    printf("pointerE\n");
+    for (auto x : pointerE)
+        printf("%d ", x);
 }
