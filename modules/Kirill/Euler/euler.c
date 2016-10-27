@@ -4,7 +4,7 @@
 #include <omp.h>
 
 // OpenMP 4.0
-#define ENABLE_PARALLEL 0
+#define ENABLE_PARALLEL 1
 
 int main() {
   FILE *fp;
@@ -88,6 +88,7 @@ int main() {
 
   int j;
   double t0 = omp_get_wtime();
+
     for (int i = 1; i <= sizeTime; i++) {
       curTime = i % N;
       prevTime = (i + 1) % N;

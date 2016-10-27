@@ -36,6 +36,8 @@ int main() {
     return -1;
   }
 
+  printf("TIMESIZE = %d; NX = %d\n", sizeTime, nX);
+
   double h = sigma*dt/(step*step);
   vector UNext(nX + 2);
 
@@ -125,7 +127,7 @@ int init(double& xStart, double& xEnd, double& sigma, size_t& nX,
 
 int final(const size_t nX, vector& UFin) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillEuler2.txt", "w");
+  fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
 
   for (int i = 1; i < nX + 1; i++)
     fprintf(fp, "%.15le\n", UFin[i]);
