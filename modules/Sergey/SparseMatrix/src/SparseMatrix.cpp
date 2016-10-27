@@ -9,7 +9,7 @@ void SparseMatrix::fillMatrix(double** &matrix, int widthSize, int heightSize) {
     int valuesCounter = 0;
     for (int i = 0; i < heightSize; ++i ) { // line
 
-        for (int j = 0; j < widthSize; ++j) {   // collumn
+        for (int j = 0; j < widthSize; ++j) {   // column
             if (matrix[i][j]!= 0 ) {
                 values.push_back(matrix[i][j]);
                 valuesCounter++;
@@ -19,7 +19,7 @@ void SparseMatrix::fillMatrix(double** &matrix, int widthSize, int heightSize) {
                 } else if (pointerB.size() == i) {
                     pointerB.push_back(valuesCounter + pointerB[0] - 1);
                 }
-                colums.push_back(j);
+                columns.push_back(j);
             }
         }
         if (pointerE.empty()) {
@@ -36,8 +36,8 @@ void SparseMatrix::printVectors() {
         printf("%lf ", x);
     printf("\n");
 
-    printf("colums\n");
-    for (auto x : colums)
+    printf("columns\n");
+    for (auto x : columns)
         printf("%d ", x);
     printf("\n");
 
