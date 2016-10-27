@@ -5,6 +5,9 @@
 #include "SparseMatrix.h"
 
 SparseMatrix::SparseMatrix(double** &matrix, int widthSize, int heightSize) {
+}
+
+void SparseMatrix::fillMatrix(double** &matrix, int widthSize, int heightSize) {
     int valuesCounter = 0;
     for (int i = 0; i < heightSize; ++i ) {
         for (int j = 0; j < widthSize; ++j) {
@@ -22,8 +25,8 @@ SparseMatrix::SparseMatrix(double** &matrix, int widthSize, int heightSize) {
         }
         if (i == 1) {
             pointerE.push_back(valuesCounter);
-        /*} else if (i = heightSize - 1 ) {
-            pointerE.push_back(valuesCounter);*/
+            /*} else if (i = heightSize - 1 ) {
+                pointerE.push_back(valuesCounter);*/
         } else {
             pointerE.push_back(valuesCounter + pointerE[0] - 1);
         }

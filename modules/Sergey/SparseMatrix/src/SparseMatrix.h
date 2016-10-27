@@ -24,6 +24,8 @@ public:
     SparseMatrix() {};
     SparseMatrix(double** &matrix, int widthSize, int heightSize);
     SparseMatrix(double* &matrix, int size);
+
+    void fillMatrix(double** &matrix, int widthSize, int heightSize);
 };
 
 

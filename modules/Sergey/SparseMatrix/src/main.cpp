@@ -39,7 +39,8 @@ int main(int argc, char** argv) {
     string filename = "INPUT.txt";
     fillMatrix(original_matrix, filename, matrixSize);
 
-    SparseMatrix matrix(original_matrix, matrixSize, matrixSize);
+    SparseMatrix matrix;
+    matrix.fillMatrix(original_matrix, matrixSize, matrixSize);
 
 
 
