@@ -32,11 +32,13 @@ void fillMatrix(double** &matrix, string filename, int &size) {
     fclose(infile);
 }
 
+
+
 int main(int argc, char** argv) {
     double** original_matrix = nullptr;
     int matrixSize = 0;
 
-    string filename = "Input.txt";
+    string filename = "InputMatrix.txt";
     fillMatrix(original_matrix, filename, matrixSize);
 
     SparseMatrix matrix;
@@ -44,7 +46,7 @@ int main(int argc, char** argv) {
     matrix.printVectors();
 
 
-    /*double xStart = 0.0, xEnd = 0.0;
+    double xStart = 0.0, xEnd = 0.0;
     double sigma = 0.0;
 
     int bc = 0; // Not use
@@ -111,5 +113,5 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
-    }*/
+    }
 }
