@@ -1,6 +1,6 @@
 set(target ${RUGEKUTT})
 
-file(GLOB srcs "*.cpp")
+file(GLOB srcs "*.c")
 
 add_executable(${target} ${srcs})
 
