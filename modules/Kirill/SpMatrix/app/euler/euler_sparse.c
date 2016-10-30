@@ -3,10 +3,11 @@
 //
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
+#include <sp_mat.h>
 
-#include "sparse_matrix.h"
+#include "sp_mat.h"
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix*, double, double);
@@ -23,9 +24,8 @@ int main() {
 
   TYPE* U;
 
-
   //------------------------------------------------------------------------
-  //                       Инициализация данных
+  //                      Инициализация данных
   //------------------------------------------------------------------------
 
   init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U);
@@ -43,82 +43,44 @@ int main() {
   printf("TIMESIZE = %d; NX = %d\n", sizeTime, nX);
 
   //------------------------------------------------------------------------
-  //          Заполнение значений и номера столбцов матрицы
+  //              Заполнение значений и номера столбцов матрицы
   //------------------------------------------------------------------------
 
   spMatrix A;
-  double coeff1 = 1.0/(step*step);
-  double coeff2 = -2.0*coeff1;
+  double coeff1 = dt/(step*step);
+  double coeff2 = 1 - 2.0*coeff1;
   createSpMat(&A, coeff1, coeff2);
 
-  spMatrix B;
-  coeff1 = dt*coeff1*0.5;
-  coeff2 = 1.0 - 2.0*coeff1;
-  createSpMat(&B, coeff1, coeff2);
-
-  spMatrix C;
-  coeff1 = coeff1*2.0;
-  coeff2 = 1.0 - 2.0*coeff1;
-  createSpMat(&C, coeff1, coeff2);
-
   // -----------------------------------------------------------------------
-  //                         Вычисления
+  //                              Вычисления
   //------------------------------------------------------------------------
 
   TYPE* UNext = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
-  TYPE* k1 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
-  TYPE* k2 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
-  TYPE* k3 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
-  TYPE* k4 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
-
   TYPE* tmp;
-
-  double h = dt/6.0;
 
   double t0 = omp_get_wtime();
   for (int i = 1; i <= sizeTime; i++) {
-
-    // k1 = A*U
-    multMV(&k1, A, U);
-
-    // k2 = B*k1
-    multMV(&k2, B, k1);
-
-    // k3 = B*k2
-    multMV(&k3, B, k2);
-
-    // k4 = C*k3
-    multMV(&k4, C, k3);
-
-//    UNext = U + (k1 + k2*2 + k3*2 + k4)*h;
-    sum(nX + 2, h, &UNext, U, k1, k2, k3, k4);
+    // UNext = A*U
+    multMV(&UNext, A, U);
 
     tmp = U;
     U = UNext;
     UNext = tmp;
   }
   double t1 = omp_get_wtime();
-  printf("finish!\n");
 
   //------------------------------------------------------------------------
   //                       Вывод результатов и чистка памяти
   //------------------------------------------------------------------------
 
+  printf("finish!\n");
   printf("time - %.15lf \n", t1 - t0);
-
   final(nX, &U);
 
-  free(U);
+//  free(U);
   free(UNext);
-  free(k1);
-  free(k2);
-  free(k3);
-  free(k4);
 
-  freeSpMat(&A);
-  freeSpMat(&B);
-  freeSpMat(&C);
-
+//  freeSpMat(&A);
   return 0;
 
 }
@@ -126,7 +88,9 @@ int main() {
 /*
 ____________________________________________________________________________
 
+
                           РЕАЛИЗАЦИЯ ФУНКЦИЙ
+
  ____________________________________________________________________________
 
 */
@@ -164,23 +128,25 @@ void createSpMat(spMatrix *mat, double coeff1, double coeff2) {
   initSpMat(mat, nX*3, nX + 3);
 
   int j = 0;
-  for (int i = 0; i < 3*nX; i += 3) {
+    mat->value[0] = 1.0;          mat->col[0] = 0;
+  for (int i = 1; i < 3*nX + 1; i += 3) {
     mat->value[i] = coeff1;       mat->col[i] = j++;
     mat->value[i + 1] = coeff2;   mat->col[i + 1] = j++;
     mat->value[i + 2] = coeff1;   mat->col[i + 2] = j--;
   }
+    mat->value[nX*3 + 1] = 1.0;   mat->col[3*nX + 1]  = nX + 1;
 
   mat->rowIndex[0] = 0;
-  mat->rowIndex[1] = 0;
+  mat->rowIndex[1] = 1;
   for (int i = 2; i < nX + 2; i++) {
     mat->rowIndex[i] = mat->rowIndex[i - 1] + 3;
   }
-  mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1];
+  mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 1;
 }
 
 int final(const int nX, TYPE** UFin) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillRungeKuttaSparse.txt", "w");
+  fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
 
   for (int i = 1; i < nX + 1; i++)
     fprintf(fp, "%.15le\n", (*UFin)[i]);

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "sparse_matrix.h"
+#include "sp_mat.h"
 
 TEST(can_mult_matrix_and_vector, spMatrix) {
   // Arrange
