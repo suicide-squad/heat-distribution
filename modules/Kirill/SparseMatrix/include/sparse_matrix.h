@@ -5,32 +5,37 @@
 #ifndef SPARSE_SPARSE_H
 #define SPARSE_SPARSE_H
 
-#include <omp.h>
-
-#include <vector>
-#include <algorithm>
-
-typedef double TYPE;
-typedef std::vector<TYPE> vector;
-
 #define ENABLE_PARALLEL 1
 
+#include <omp.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef double TYPE;
+
 // CSR (Compressed Sparse Rows)
-class SpareMatrix {
- public:
-  explicit SpareMatrix(TYPE*, int*, int*, const size_t , const size_t);
-  ~SpareMatrix();
-  vector operator*(const vector&);
+typedef struct {
+  TYPE* value;   // Элементы матрицы
+  int* col;      // Номера столбцов для каждого элемента
+  int* rowIndex; // Место каждого ненулевого элемента в каждой строке
+  int nz;        // Количество ненулевых
+  int nRows;     // Количество строк
+} spMatrix;
+
+void initSpMat(spMatrix* mat, int nz, int nRows);
+void freeSpMat(spMatrix* mat);
+
+void multMV(TYPE** result, spMatrix matrix, TYPE* vector);
 
 
- private:
-  TYPE* value_;   // Элементы матрицы
-  int* col_;      // Номера столбцов для каждого элемента
-  int* rowIndex_; // Место каждого ненулевого элемента в каждой строке
-  size_t nz_;        // Количество ненулевых
-  size_t nRows_;     // Количество строк
-};
+void sum(int N, double h, TYPE **result, TYPE *U, TYPE *k1, TYPE *k2, TYPE *k3, TYPE *k4);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif //SPARSE_SPARSE_H

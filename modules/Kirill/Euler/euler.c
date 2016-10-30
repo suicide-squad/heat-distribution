@@ -4,7 +4,7 @@
 #include <omp.h>
 
 // OpenMP 4.0
-#define ENABLE_PARALLEL 0
+#define ENABLE_PARALLEL 1
 
 int main() {
   FILE *fp;
@@ -47,6 +47,7 @@ int main() {
   printf("XSTART=%lf; XEND=%lf; SIGMA=%lf; NX=%d; TSTART=%lf;"
              " TFINISH=%lf;"" dt=%lf; BC=%d;\n",
          xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
+  printf("TIMESIZE = %d; NX = %d\n", sizeTime, nX);
 
   for (int i = 0; i < N; i++) {
     U[i] = (double *) malloc((nX + 2) * sizeof(double));
@@ -87,6 +88,7 @@ int main() {
 
   int j;
   double t0 = omp_get_wtime();
+
     for (int i = 1; i <= sizeTime; i++) {
       curTime = i % N;
       prevTime = (i + 1) % N;

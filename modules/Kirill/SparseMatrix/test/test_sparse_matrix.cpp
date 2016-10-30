@@ -1,58 +1,58 @@
 #include <gtest/gtest.h>
-#include <sparse_matrix.h>
 
 #include "sparse_matrix.h"
 
-TEST(can_init_matrix, SpareMatrix) {
-  // Arrange
-  TYPE value[] = {1, 2, 3, 4, 8, 5, 7, 1, 6};
-  int col[] = {0, 2, 4, 3, 3, 5, 1, 2, 5};
-  int rowIndex[] = {0, 2, 4, 4, 6, 6, 9};
-
-  // Act
-  SpareMatrix s(value, col, rowIndex, 9, 6);
-
-  // Assert
-  //EXPECT_EQ(*value, *s.getValue());
-}
-
-
-TEST(can_mult_matrix_and_vector, SpareMatrix) {
+TEST(can_mult_matrix_and_vector, spMatrix) {
   // Arrange
   const int N = 6;
+  const int NZ = 9;
+  spMatrix A;
+  initSpMat(&A, NZ, N);
   TYPE value[] = {1, 2, 3, 4, 8, 5, 7, 1, 6};
   int col[] = {0, 4, 2, 3, 3, 5, 1, 2, 5};
   int rowIndex[] = {0, 2, 4, 4, 6, 6, 9};
-  SpareMatrix s(value, col, rowIndex, 9, 6);
 
-  vector v = {1, 2, 4, 1, 0, 3};
+  for (int i = 0; i < N + 1; i++)
+    A.rowIndex[i] = rowIndex[i];
+
+  for (int i = 0; i < NZ; i++) {
+    A.col[i] = col[i];
+    A.value[i] = value[i];
+  }
+
+  TYPE v[] = {1, 2, 4, 1, 0, 3};
 
   // Act
-  vector res = s*v;
+  TYPE* result = (TYPE *)malloc(sizeof(TYPE) * N);
+  multMV(&result, A, v);
 
   // Assert
-  vector expected_v = {1, 16, 0, 23, 0, 36};
-  EXPECT_EQ(expected_v, res);
+  TYPE expected_v[] = {1, 16, 0, 23, 0, 36};
+  for (int i = 0; i < N; i++)
+    EXPECT_EQ(expected_v[i], result[i]);
+  freeSpMat(&A);
+  free(result);
 }
 
-TEST(can_mult_matrix_m_n_and_vector, SpareMatrix) {
+TEST(can_sum, vectors) {
   // Arrange
-  const int m = 5;
-  const int n = 4;
-  const int nz = 6;
-  TYPE value[nz] = {3, 3, 1, 1, 1, 1};
-  int col[nz] = {0, 1, 2, 3, 0, 3};
-  int rowIndex[m + 1] = {0, 1, 3, 3, 4, 6};
-  SpareMatrix s(value, col, rowIndex, nz, m);
+  const int N = 4;
+  const double h = 0.5;
 
-  vector v = {1, 2, 0, 1};
+  TYPE U[] = {1, 2, 4, 1};
+  TYPE k1[] = {1, 1, 5, 0};
+  TYPE k2[] = {2, 1, 3, 1};
+  TYPE k3[] = {0, 1, 1, 1};
+  TYPE k4[] = {3, 3, 1, 0};
+
 
   // Act
-  vector res = s*v;
+  TYPE* result = (TYPE *)malloc(sizeof(TYPE) * N);
+  sum(N, h, &result, U, k1, k2, k3 ,k4);
 
   // Assert
-  vector expected_v = {3, 6, 0, 1, 2};
-  EXPECT_EQ(expected_v, res);
+  TYPE expected_v[] = {5, 6, 11, 3};
+  for (int i = 0; i < N; i++)
+    EXPECT_EQ(expected_v[i], result[i]);
+  free(result);
 }
-
-
