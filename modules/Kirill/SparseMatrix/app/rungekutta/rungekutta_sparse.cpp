@@ -39,84 +39,74 @@ int main() {
   printf("TIMESIZE = %d; NX = %lu\n", sizeTime, nX);
 
 
-
   // Для матрицы А
-  double* valA = new double[nX*3 + 2];
-  int* colA = new int[nX*3 + 2];
-  int* rowIA = new int[nX + 2 + 1];
+  double* valA = new double[nX*3];
+  int* colA = new int[nX*3];
+  int* rowIA = new int[nX + 3];
 
   // Для матрицы B
-  double* valB = new double[nX*3 + 2];
-  int* colB = new int[nX*3 + 2];
-  int* rowIB = new int[nX + 2 + 1];
+  double* valB = new double[nX*3];
+  int* colB = new int[nX*3];
+  int* rowIB = new int[nX + 3];
 
   // Для матрицы C
-  double* valC = new double[nX*3 + 2];
-  int* colC = new int[nX*3 + 2];
-  int* rowIC = new int[nX + 2 + 1];
+  double* valC = new double[nX*3];
+  int* colC = new int[nX*3];
+  int* rowIC = new int[nX + 3];
 
   //------------------------------------------------------------------------
   //          Заполнение значений и номера столбцов матрицы
   //------------------------------------------------------------------------
 
-  double h = 1/(step*step);
+  double h = 1.0/(step*step);
   double r1 = dt*h*0.5;
   double r2 = dt*h;
 
   //          Matrix A
 
-  valA[0] = 1; colA[0] = 0;
   int j = 0;
-  for (int i = 1; i < 3*nX + 1; i+=3) {
-    valA[i] = h; colA[i] = j++;
-    valA[i + 1] = -2*h; colA[i + 1] = j++;
-    valA[i + 2] = h; colA[i + 2] = j--;
+  for (int i = 0; i < 3*nX; i +=3 ) {
+    valA[i] = h;            colA[i] = j++;
+    valA[i + 1] = -2.0*h;   colA[i + 1] = j++;
+    valA[i + 2] = h;        colA[i + 2] = j--;
   }
-  valA[nX*3 + 1] = 1; colA[3*nX + 1] = static_cast<int>(nX) + 1;
 
   rowIA[0] = 0;
-  rowIA[1] = 1;
+  rowIA[1] = 0;
   for (int i = 2; i < nX + 2; i++) {
     rowIA[i] = rowIA[i - 1] + 3;
   }
-  rowIA[nX + 2] = rowIA[nX + 1] + 1;
+  rowIA[nX + 2] = rowIA[nX + 1];
 
   //          Matrix B
-
-  //valA[0] = 1; colA[0] = 0;
   j = 0;
-  for (int i = 1; i < 3*nX + 1; i+=3) {
-    valB[i] = r1; colB[i] = j++;
-    valB[i + 1] = -2*r1; colB[i + 1] = j++;
-    valB[i + 2] = r1; colB[i + 2] = j--;
+  for (int i = 0; i < 3*nX; i += 3) {
+    valB[i] = r1;                 colB[i] = j++;
+    valB[i + 1] = 1.0 - 2.0*r1;   colB[i + 1] = j++;
+    valB[i + 2] = r1;             colB[i + 2] = j--;
   }
- // valA[nX*3 + 1] = 1; colA[3*nX + 1] = static_cast<int>(nX) + 1;
-
+  
   rowIB[0] = 0;
-  //rowIA[1] = 1;
-  for (int i = 1; i < nX + 1; i++) {
+  rowIB[1] = 0;
+  for (int i = 2; i < nX + 2; i++) {
     rowIB[i] = rowIB[i - 1] + 3;
   }
-  rowIA[nX + 1] = rowIA[nX] + 1;
-//
+  rowIB[nX + 2] = rowIB[nX + 1];
 
   //          Matrix C
-
-  //valA[0] = 1; colA[0] = 0;
   j = 0;
-  for (int i = 1; i < 3*nX + 1; i+=3) {
-    valC[i] = r2; colC[i] = j++;
-    valC[i + 1] = -2*r2; colC[i + 1] = j++;
-    valC[i + 2] = r2; colC[i + 2] = j--;
+  for (int i = 0; i < 3*nX; i+=3) {
+    valC[i] = r2;             colC[i] = j++;
+    valC[i + 1] = 1 - 2*r2;   colC[i + 1] = j++;
+    valC[i + 2] = r2;         colC[i + 2] = j--;
   }
-  // valA[nX*3 + 1] = 1; colA[3*nX + 1] = static_cast<int>(nX) + 1;
 
   rowIC[0] = 0;
-  //rowIA[1] = 1;
-  for (int i = 1; i < nX + 1; i++) {
+  rowIC[1] = 1;
+  for (int i = 2; i < nX + 2; i++) {
     rowIC[i] = rowIC[i - 1] + 3;
   }
-  rowIC[nX + 1] = rowIC[nX] + 1;
+  rowIC[nX + 2] = rowIC[nX + 1];
 
 
   // -----------------------------------------------------------------------
@@ -126,17 +116,19 @@ int main() {
   vector UNext(nX + 2);
   vector k1, k2, k3, k4;
 
-  SpareMatrix A(valA, colA, rowIA, nX * 3 + 2, nX + 2);
-  SpareMatrix B(valB, colB, rowIB, nX * 3, nX);
-  SpareMatrix C(valC, colC, rowIC, nX * 3, nX);
-  double g = step/6;
+  SpareMatrix A(valA, colA, rowIA, nX * 3, nX + 2);
+  SpareMatrix B(valB, colB, rowIB, nX * 3, nX + 2);
+  SpareMatrix C(valC, colC, rowIC, nX * 3, nX + 2);
+  double g = dt/6.0;
+
+  printf("%d\n\n", rowIB[nX+2]);
 
   double t0 = omp_get_wtime();
   for (int i =1; i <= sizeTime; i++) {
     k1 = A * U;
-    k2 = k1 + B * k1;
-    k3 = k1 + B * k2;
-    k4 = k1 + C * k3;
+    k2 = B * k1;
+    k3 = B * k2;
+    k4 = C * k3;
 
     UNext = U + (k1 + k2*2 + k3*2 + k4)*g;
     std::swap (UNext, U);
