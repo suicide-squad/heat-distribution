@@ -28,7 +28,27 @@ vector SpareMatrix::operator*(const vector& v) {
       for (int j = rowIndex_[i]; j < rowIndex_[i + 1]; j++)
         localSum += value_[j] * v[col_[j]];
       result[i] = localSum;
-
+    }
+  }
+  return result;
+}
+void SpareMatrix::print() {
+  for (int i = 0; i < nRows_; i++) {
+    for (int j = 0; j < nRows_; j++)
+      printf("%3.7lf\t", this->operator()(i, j));
+    printf("\n");
+  }
+}
+TYPE SpareMatrix::operator()(int i, int j) {
+  TYPE result = 0;
+  int N1 = rowIndex_[i];
+  int N2 = rowIndex_[i+1];
+  for(int k = N1; k < N2; k++)
+  {
+    if (col_[k] == j)
+    {
+      result = value_[k];
+      break;
     }
   }
   return result;
