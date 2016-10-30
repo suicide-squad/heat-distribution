@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "sparse_matrix.h"
+#include "sp_mat.h"
 
 int init(double&, double&, double&, size_t&, double&, double&, double&, int&, vector&);
 int final(const size_t, vector&);

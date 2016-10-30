@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sparse_matrix.h"
+#include "sp_mat.h"
 
 void initSpMat(spMatrix* mat, int nz, int nRows) {
   mat->nz = nz;

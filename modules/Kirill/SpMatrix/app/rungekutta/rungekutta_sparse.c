@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "sparse_matrix.h"
+#include "sp_mat.h"
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix*, double, double);
@@ -90,7 +90,7 @@ int main() {
     // k4 = C*k3
     multMV(&k4, C, k3);
 
-//    UNext = U + (k1 + k2*2 + k3*2 + k4)*h;
+    // UNext = U + (k1 + k2*2 + k3*2 + k4)*h;
     sum(nX + 2, h, &UNext, U, k1, k2, k3, k4);
 
     tmp = U;
