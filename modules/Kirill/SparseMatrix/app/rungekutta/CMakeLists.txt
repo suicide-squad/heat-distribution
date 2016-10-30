@@ -1,4 +1,4 @@
-set(target ${RUGEKUTT})
+set(target ${RUNGEKUTT})
 
 file(GLOB srcs "*.c")
 

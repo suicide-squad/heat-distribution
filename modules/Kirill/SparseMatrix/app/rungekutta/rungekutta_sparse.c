@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "sparse_matrix.h"
 
@@ -46,17 +47,16 @@ int main() {
   //------------------------------------------------------------------------
 
   spMatrix A;
-  spMatrix B;
-  spMatrix C;
-
   double coeff1 = 1.0/(step*step);
   double coeff2 = -2.0*coeff1;
   createSpMat(&A, coeff1, coeff2);
 
+  spMatrix B;
   coeff1 = dt*coeff1*0.5;
   coeff2 = 1.0 - 2.0*coeff1;
   createSpMat(&B, coeff1, coeff2);
 
+  spMatrix C;
   coeff1 = coeff1*2.0;
   coeff2 = 1.0 - 2.0*coeff1;
   createSpMat(&C, coeff1, coeff2);
@@ -98,12 +98,12 @@ int main() {
     UNext = tmp;
   }
   double t1 = omp_get_wtime();
+  printf("finish!\n");
 
   //------------------------------------------------------------------------
   //                       Вывод результатов и чистка памяти
   //------------------------------------------------------------------------
 
-  printf("finish!\n");
   printf("time - %.15lf \n", t1 - t0);
 
   final(nX, &U);
@@ -126,9 +126,7 @@ int main() {
 /*
 ____________________________________________________________________________
 
-
                           РЕАЛИЗАЦИЯ ФУНКЦИЙ
-
  ____________________________________________________________________________
 
 */
