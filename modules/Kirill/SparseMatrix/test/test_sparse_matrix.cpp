@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
-#include <sparse_matrix.h>
 
 #include "sparse_matrix.h"
 
-TEST(can_mult_matrix_and_vector, SpareMatrix) {
+TEST(can_mult_matrix_and_vector, spMatrix) {
   // Arrange
   const int N = 6;
   const int NZ = 9;
@@ -35,65 +34,25 @@ TEST(can_mult_matrix_and_vector, SpareMatrix) {
   free(result);
 }
 
-//TEST(can_mult_matrix_m_n_and_vector, SpareMatrix) {
-//  // Arrange
-//  const int m = 5;
-//  const int n = 4;
-//  const int nz = 6;
-//  TYPE value[nz] = {3, 3, 1, 1, 1, 1};
-//  int col[nz] = {0, 1, 2, 3, 0, 3};
-//  int rowIndex[m + 1] = {0, 1, 3, 3, 4, 6};
-//  SpareMatrix s(value, col, rowIndex, nz, m);
-//
-//  vector v = {1, 2, 0, 1};
-//
-//  // Act
-//  vector res = s*v;
-//
-//  // Assert
-//  vector expected_v = {3, 6, 0, 1, 2};
-//  EXPECT_EQ(expected_v, res);
-//}
-//
-//TEST(can_add_vectors, vector) {
-//  // Arrange
-//  vector v1 = {1, 2, 0, 1};
-//  vector v2 = {4, 5, 7, 1};
-//
-//  // Act
-//  vector res = v1 + v2;
-//
-//  // Assert
-//  vector expected_v = {5, 7, 7, 2};
-//  EXPECT_EQ(expected_v, res);
-//}
-//
-//
-//TEST(can_mult_vectors_and_number, vector) {
-//  // Arrange
-//  vector v = {1, 2, 0, 1};
-//  TYPE d = 3;
-//
-//  // Act
-//  vector res = v * d;
-//
-//  // Assert
-//  vector expected_v = {3, 6, 0, 3};
-//  EXPECT_EQ(expected_v, res);
-//}
-//
-//
-//TEST(can_return_elem, SpareMatrix) {
-//  // Arrange
-//  TYPE value[] = {1, 2, 3, 4, 8, 5, 7, 1, 6};
-//  int col[] = {0, 4, 2, 3, 3, 5, 1, 2, 5};
-//  int rowIndex[] = {0, 2, 4, 4, 6, 6, 9};
-//  SpareMatrix s(value, col, rowIndex, 9, 6);
-//
-//  // Act
-//  TYPE res = s(0,0);
-//
-//  // Assert
-//  TYPE expected_elem = 1;
-//  EXPECT_EQ(expected_elem, res);
-//}
+TEST(can_sum, vectors) {
+  // Arrange
+  const int N = 4;
+  const double h = 0.5;
+
+  TYPE U[] = {1, 2, 4, 1};
+  TYPE k1[] = {1, 1, 5, 0};
+  TYPE k2[] = {2, 1, 3, 1};
+  TYPE k3[] = {0, 1, 1, 1};
+  TYPE k4[] = {3, 3, 1, 0};
+
+
+  // Act
+  TYPE* result = (TYPE *)malloc(sizeof(TYPE) * N);
+  sum(N, h, &result, U, k1, k2, k3 ,k4);
+
+  // Assert
+  TYPE expected_v[] = {5, 6, 11, 3};
+  for (int i = 0; i < N; i++)
+    EXPECT_EQ(expected_v[i], result[i]);
+  free(result);
+}
