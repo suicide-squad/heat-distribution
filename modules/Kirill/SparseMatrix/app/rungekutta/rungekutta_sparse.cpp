@@ -85,7 +85,7 @@ int main() {
     valB[i + 1] = 1.0 - 2.0*r1;   colB[i + 1] = j++;
     valB[i + 2] = r1;             colB[i + 2] = j--;
   }
-  
+
   rowIB[0] = 0;
   rowIB[1] = 0;
   for (int i = 2; i < nX + 2; i++) {

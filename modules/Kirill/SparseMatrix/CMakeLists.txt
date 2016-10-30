@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(SparseMatrix)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
@@ -21,4 +21,4 @@ include_directories("./include")
 
 add_subdirectory(src)
 add_subdirectory(test)
-add_subdirectory(app)
+#add_subdirectory(app)

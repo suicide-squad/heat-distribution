@@ -7,59 +7,31 @@
 
 #include <omp.h>
 
-#include <vector>
-#include <algorithm>
-#include <iostream>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef double TYPE;
-
-class vector : public std::vector<TYPE> {
- public:
-  vector(size_t size) : std::vector<TYPE>(size) {}
-  vector() : std::vector<TYPE>() {}
-  vector(std::initializer_list<TYPE> list) : std::vector<TYPE>(list) {}
-  vector operator+ (const vector& b) {
-    vector result(size());
-    for(int i = 0; i < size(); ++i)
-      result[i] = this->at(i) + b[i];
-    return result;
-  }
-  void print() const {
-    for (auto i = begin(); i!= end(); ++i)
-      printf("%2.2lf \n", *i);
-    printf("\n");
-  }
-
-
-  vector operator* (const TYPE b) {
-    vector result(size());
-    for (int i = 0; i < size(); ++i)
-      result[i] = this->at(i)*b;
-    return result;
-  }
-};
 
 #define ENABLE_PARALLEL 1
 
 // CSR (Compressed Sparse Rows)
-class SpareMatrix {
- public:
-  explicit SpareMatrix(TYPE*, int*, int*, const size_t , const size_t);
-  ~SpareMatrix();
-  vector operator*(const vector&);
-  void print();
-  TYPE operator()(int i, int j);
+typedef struct {
+  TYPE* value;   // Элементы матрицы
+  int* col;      // Номера столбцов для каждого элемента
+  int* rowIndex; // Место каждого ненулевого элемента в каждой строке
+  int nz;        // Количество ненулевых
+  int nRows;     // Количество строк
+} spMatrix;
 
+void initSpMat(spMatrix* mat, int nz, int nRows);
+void freeSpMat(spMatrix* mat);
 
+void multMV(TYPE** result, spMatrix matrix, TYPE* vector);
 
- private:
-  TYPE* value_;   // Элементы матрицы
-  int* col_;      // Номера столбцов для каждого элемента
-  int* rowIndex_; // Место каждого ненулевого элемента в каждой строке
-  size_t nz_;        // Количество ненулевых
-  size_t nRows_;     // Количество строк
-};
-
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif //SPARSE_SPARSE_H
