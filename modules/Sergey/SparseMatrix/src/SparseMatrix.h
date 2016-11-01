@@ -20,6 +20,7 @@ public:
     SparseMatrix() {};
     void fillMatrix(double** &matrix, int widthSize, int heightSize);
     void printVectors();
+    void multiplicateVector(vector<double> &vect);
 };
 
 

@@ -50,3 +50,7 @@ void SparseMatrix::printVectors() {
     for (auto x : pointerE)
         printf("%d ", x);
 }
+
+void SparseMatrix::multiplicateVector(vector<double> &vect) {
+
+}
