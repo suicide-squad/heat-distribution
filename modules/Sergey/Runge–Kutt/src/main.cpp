@@ -37,8 +37,6 @@ int main(int argc, char** argv) {
     fscanf(infile, "dt=%lf\n", &dt);            // delta of time difference
     fscanf(infile, "BC=%d\n", &bc);         // Not using right now
 
-    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
-           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
     double** vect = new double*[2];
     vect[0] = new double[nX + 2];
     vect[1] = new double[nX + 2];
@@ -62,22 +60,34 @@ int main(int argc, char** argv) {
     double* k4Vect = new double[nX + 2];
 
     double expression = sigma / (step * step);
+
+    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
+           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+    printf("expre %lf, step %lf", expression, step);
     //FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
 
     for (double j = 0; j < tFinal; j += dt) {
         // Fill k1 vect
         for (int i = 1; i <= nX; i++) {
-            k1Vect[i] = expression * (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1]);
+            k1Vect[i] = (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression;
+            if (j == 0) {
+                if (k1Vect[i] > 780) {
+                    printf("KURWA %lf %lf %lf %lf\n", (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]),
+                           vect[prevTime][i + 1], -2.0 * vect[prevTime][i], vect[prevTime][i - 1]);
+                    printf("KURWAAAAAAaa %lf \n", (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression);
+                }
+                printf("==%lf \n", k1Vect[i]);
+            }
         }
         //bounders k1
         k1Vect[0] = k1Vect[1];
         k1Vect[nX + 1] = k1Vect[nX];
 
-        // Fill k2 vect
+        // Fill k2.0 vect
         for (int i = 1; i <= nX; i++) {
-            k2Vect[i] = expression * (vect[prevTime][i + 1]) + (k1Vect[i + 1] * dt / 2)
-                        - (2 * vect[prevTime][i] + k1Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k1Vect[i - 1] * dt / 2;
+            k2Vect[i] = expression * ((vect[prevTime][i + 1]) + (k1Vect[i + 1] * dt / 2.0)
+                        - (2.0 * vect[prevTime][i] + k1Vect[i] * dt)
+                        + vect[prevTime][i - 1] + k1Vect[i - 1] * dt / 2.0);
         }
         // bounders
         k2Vect[0] = k2Vect[1];
@@ -85,9 +95,9 @@ int main(int argc, char** argv) {
 
         // Fill k3 vect
         for (int i = 1; i <= nX; i++) {
-            k3Vect[i] = expression * (vect[prevTime][i + 1]) + (k2Vect[i + 1] * dt / 2)
-                        - (2 * vect[prevTime][i] + k2Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k2Vect[i - 1] * dt / 2;
+            k3Vect[i] = expression * ((vect[prevTime][i + 1]) + (k2Vect[i + 1] * dt / 2.0)
+                        - (2.0 * vect[prevTime][i] + k2Vect[i] * dt)
+                        + vect[prevTime][i - 1] + k2Vect[i - 1] * dt / 2.0);
         }
         // bounders
         k3Vect[0] = k3Vect[1];
@@ -95,9 +105,9 @@ int main(int argc, char** argv) {
 
         // Fill k4 vect
         for (int i = 1; i <= nX; i++) {
-            k4Vect[i] = expression * (vect[prevTime][i + 1]) + (k3Vect[i + 1] * dt)
-                        - (2 * vect[prevTime][i] + k3Vect[i] * 2 * dt)
-                        + vect[prevTime][i - 1] + k3Vect[i - 1] * dt;
+            k4Vect[i] = expression * ((vect[prevTime][i + 1]) + (k3Vect[i + 1] * dt)
+                        - (2.0 * vect[prevTime][i] + k3Vect[i] * 2.0 * dt)
+                        + vect[prevTime][i - 1] + k3Vect[i - 1] * dt);
         }
         // bounders
         k4Vect[0] = k4Vect[1];
@@ -105,10 +115,14 @@ int main(int argc, char** argv) {
 
         // FIll result vector
         for (int i = 1; i <= nX; i++) {
-            vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2*k2Vect[i] + 2*k3Vect[i] + k4Vect[i]));
-            //fprintf(outfile, "%2.15le\t", vect[currTime][i]);
+            vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2.0*k2Vect[i] + 2.0*k3Vect[i] + k4Vect[i]));
+            if (j > 10*dt - dt && j < 10*dt + dt) {
+                printf("====%lf \n", (dt / 6) * (k1Vect[i] + 2.0*k2Vect[i] + 2.0*k3Vect[i] + k4Vect[i]) );
+                printf("====KURWA?", vect[currTime][i]);
+            }
+            // /fprintf(outfile, "%2.15le\t", vect[currTime][i]);
         }
-//        fprintf(outfile, "\n");
+        //  fprintf(outfile, "\n");
 
         // boundary conditions
         vect[currTime][0] = vect[currTime][1];
