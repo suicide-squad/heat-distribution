@@ -23,9 +23,9 @@ void SparseMatrix::fillMatrix(double** &matrix, int widthSize, int heightSize) {
             }
         }
         if (pointerE.empty()) {
-            pointerE.push_back(valuesCounter + 1);
+            pointerE.push_back(valuesCounter);
         } else if (pointerE.size() == i) {
-            pointerE.push_back(valuesCounter + 1);
+            pointerE.push_back(valuesCounter);
         }
     }
 }
@@ -49,16 +49,23 @@ void SparseMatrix::printVectors() {
     printf("pointerE\n");
     for (auto x : pointerE)
         printf("%d ", x);
+    printf("\n");
 }
 
-double* SparseMatrix::multiplicateVector(vector<double> &vect) {
-/*    double resultVector[vect.size()] = {0,};
+double* SparseMatrix::multiplicateVector(vector<double> vect) {
+    double* resultVector = new double[vect.size()];
+    for (int i = 0; i < vect.size(); i++) {
+        resultVector[i] = 0;
+    }
+
 
     int index = 0;
     for (int i = 0; i < vect.size(); i++){  // iteration FOR RESULT VECTOR!!!
-        for () {
-            ;
-            //resultVector[i] += values[];
+        while (index < pointerE[i]) {
+            resultVector[i] += values[index] * vect[columns[index]];
+            ++index;
         }
-    }*/
+    }
+
+    return  resultVector;
 }

@@ -44,18 +44,16 @@ int main(int argc, char** argv) {
     SparseMatrix matrix;
     matrix.fillMatrix(original_matrix, matrixSize, matrixSize);
     matrix.printVectors();
-/*    // Vector 2
-    vector<double> vect = fillVect();
-
-    matrix.multiplicateVector(vect);
-    matrix.printVectors();*/
-
-
-
-}
-
-vector<double> fillVect() {
+    // Vector 2
     vector<double> vect;
     vect.push_back(2);
     vect.push_back(3);
+    vect.push_back(5);
+
+    double* res_vect = matrix.multiplicateVector(vect);
+    for (int i = 0; i < vect.size(); ++i) {
+        printf("%lf\n", res_vect[i]);
+    }
+
+
 }
