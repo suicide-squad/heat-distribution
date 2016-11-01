@@ -63,21 +63,11 @@ int main(int argc, char** argv) {
 
     printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
-    printf("expre %lf, step %lf", expression, step);
-    //FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
 
     for (double j = 0; j < tFinal; j += dt) {
         // Fill k1 vect
         for (int i = 1; i <= nX; i++) {
             k1Vect[i] = (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression;
-            if (j == 0) {
-                if (k1Vect[i] > 780) {
-                    printf("KURWA %lf %lf %lf %lf\n", (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]),
-                           vect[prevTime][i + 1], -2.0 * vect[prevTime][i], vect[prevTime][i - 1]);
-                    printf("KURWAAAAAAaa %lf \n", (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression);
-                }
-                printf("==%lf \n", k1Vect[i]);
-            }
         }
         //bounders k1
         k1Vect[0] = k1Vect[1];
@@ -116,13 +106,8 @@ int main(int argc, char** argv) {
         // FIll result vector
         for (int i = 1; i <= nX; i++) {
             vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2.0*k2Vect[i] + 2.0*k3Vect[i] + k4Vect[i]));
-            if (j > 10*dt - dt && j < 10*dt + dt) {
-                printf("====%lf \n", (dt / 6) * (k1Vect[i] + 2.0*k2Vect[i] + 2.0*k3Vect[i] + k4Vect[i]) );
-                printf("====KURWA?", vect[currTime][i]);
-            }
-            // /fprintf(outfile, "%2.15le\t", vect[currTime][i]);
+
         }
-        //  fprintf(outfile, "\n");
 
         // boundary conditions
         vect[currTime][0] = vect[currTime][1];
