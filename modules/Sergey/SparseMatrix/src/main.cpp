@@ -44,12 +44,11 @@ int main(int argc, char** argv) {
     SparseMatrix matrix;
     matrix.fillMatrix(original_matrix, matrixSize, matrixSize);
     matrix.printVectors();
-
-    // Vector 2
+/*    // Vector 2
     vector<double> vect = fillVect();
 
     matrix.multiplicateVector(vect);
-    matrix.printVectors();
+    matrix.printVectors();*/
 
 
 
