@@ -58,7 +58,6 @@ double* SparseMatrix::multiplicateVector(vector<double> vect) {
         resultVector[i] = 0;
     }
 
-
     int index = 0;
     for (int i = 0; i < vect.size(); i++){  // iteration FOR RESULT VECTOR!!!
         while (index < pointerE[i]) {
@@ -68,4 +67,43 @@ double* SparseMatrix::multiplicateVector(vector<double> vect) {
     }
 
     return  resultVector;
+}
+
+void SparseMatrix::multiplicateVector(double *&vect, double *&result, int size) {
+    int index = 0;
+    for (int i = 0; i < size; i++){  // iteration FOR RESULT VECTOR!!!
+        while (index < pointerE[i]) {
+            result[i] += values[index] * vect[columns[index]];
+            ++index;
+        }
+    }
+}
+
+void SparseMatrix::testEuler(int size, double expr) {
+    int index = 0;
+    values.push_back(1);
+    columns.push_back(0);
+    pointerB.push_back(index++);
+    // TODO remove this array
+    pointerE.push_back(index);
+    for (int i = 1; i < size - 1; ++i) {
+
+        values.push_back(expr);
+        columns.push_back(i-1);
+        pointerB.push_back(index++);
+
+        values.push_back(-2*expr);
+        columns.push_back(i);
+        ++index;
+
+        values.push_back(expr);
+        columns.push_back(i+1);
+        ++index;
+
+        pointerE.push_back(index);
+    }
+    values.push_back(1);
+    columns.push_back(size - 1);
+    pointerB.push_back(index++);
+    pointerE.push_back(index);
 }

@@ -21,6 +21,9 @@ public:
     void fillMatrix(double** &matrix, int widthSize, int heightSize);
     void printVectors();
     double* multiplicateVector(vector<double> vect);
+    double* multiplicateVector(double* &vect);
+    void multiplicateVector(double* &vect, double* &result, int size);
+    void testEuler(int size, double expr);
 };
 
 
