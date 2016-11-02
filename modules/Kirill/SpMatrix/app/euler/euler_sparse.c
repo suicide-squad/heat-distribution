@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <sp_mat.h>
 
-#include "sp_mat.h"
-
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix*, double, double);
 int final(const int, TYPE**);
