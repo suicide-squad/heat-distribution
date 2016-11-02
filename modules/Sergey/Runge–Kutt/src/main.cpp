@@ -4,7 +4,7 @@
 using std::string;
 
 int main(int argc, char** argv) {
-    string filename = "INPUT.txt";
+    string filename = "../../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
