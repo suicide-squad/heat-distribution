@@ -3,4 +3,5 @@ __pycache__/
 
 # C
 Debug/
+Release/
 .idea/
