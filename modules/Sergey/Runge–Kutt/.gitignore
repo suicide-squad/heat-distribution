@@ -1,3 +1,2 @@
-
-Будет удалено .gitignore
-Будет удалено build/
+build
+.idea

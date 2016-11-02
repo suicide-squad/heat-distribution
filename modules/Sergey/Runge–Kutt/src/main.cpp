@@ -22,7 +22,6 @@ int main(int argc, char** argv) {
     double dt = 0.0;
 
     int i, j;
-    int sizeTime = 0;
     int currTime, prevTime;
 
     double step = 0.0;
@@ -64,7 +63,9 @@ int main(int argc, char** argv) {
     printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
-    for (double j = 0; j < tFinal; j += dt) {
+    int timeStep = (int) ((tFinal - tStart) / dt);
+
+    for (double j = 0; j < timeStep; j += 1) {
         // Fill k1 vect
         for (int i = 1; i <= nX; i++) {
             k1Vect[i] = (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression;
