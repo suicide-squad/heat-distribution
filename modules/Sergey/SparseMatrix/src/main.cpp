@@ -94,11 +94,10 @@ int main(int argc, char** argv) {
     printf("%lf", (sigma * dt) / (step * step));
 
     SparseMatrix matrix;
-    matrix.testEuler(nX, expression);
-    matrix.printVectors();
+    matrix.testEuler(nX+2, expression);
 
     for (double j = 0; j < tFinal; j += dt) {
-        matrix.multiplicateVector(vect[prevTime], vect[currTime], nX);
+        matrix.multiplicateVector(vect[prevTime], vect[currTime], nX+2);
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
