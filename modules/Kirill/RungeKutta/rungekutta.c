@@ -1,11 +1,11 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <omp.h>
 
 int main() {
   FILE *fp;
 
-  int t, x;
   int sizeTime = 0;
   int curTime, prevTime;
 
@@ -18,7 +18,10 @@ int main() {
   double tStart = 0.0, tFinal = 0.0;
   double dt = 0.0;
   unsigned char check = 0;
-  double step = 0.0;
+
+  //------------------------------------------------------------------------
+  //                Инициализация из файла
+  //------------------------------------------------------------------------
 
   if((fp=fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
@@ -37,14 +40,14 @@ int main() {
 
   sizeTime = (int)((tFinal - tStart)/dt);
 
-  printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n",xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
+  printf("TIMESIZE = %d; NX = %d\n", sizeTime, nX);
 
-  for (x = 0; x < N; x++) {
+  for (int x = 0; x < N; x++) {
     U[x] = (double *)malloc((nX + 2)*sizeof(double));
   }
 
   //  Вычисление шага по x
-  step = fabs(xStart - xEnd)/nX;
+  double step = fabs(xStart - xEnd)/nX;
 
   if (2*sigma*dt > step*step) {
     printf("Выбор шага по времени не возможен в силу условия устойчивости!");
@@ -52,7 +55,7 @@ int main() {
   }
 
   // Заполнение функции в нулевой момент времени
-  for (x = 1; x < nX -1; x++) {
+  for (int x = 1; x < nX -1; x++) {
     fscanf(fp, "%lf", &U[0][x]);
   }
 
@@ -72,41 +75,37 @@ int main() {
   double* k3 =  (double *)malloc((nX + 2)*sizeof(double));
   double* k4 =  (double *)malloc((nX + 2)*sizeof(double));
 
-  // Заполнение сетки
-  for (t = 1; t <= sizeTime; t++) {
+  double coeff = 1.0/(step * step);
+  double h = dt/6.0;
+
+  // -----------------------------------------------------------------------
+  //                         Вычисления
+  //------------------------------------------------------------------------
+
+  double t0 = omp_get_wtime();
+  for (int t = 1; t <= sizeTime; t++) {
     curTime = t%N;
     prevTime = (t + 1)%N;
 
     // Вычисление ki в данный момент времени
-    for (x = 1; x < nX + 2; x++)
-      k1[x] = (U[prevTime][x + 1] - 2 * U[prevTime][x] + U[prevTime][x - 1]) / (step * step);
+    for (int x = 1; x < nX + 2; x++)
+      k1[x] = (U[prevTime][x + 1] - 2.0 * U[prevTime][x] + U[prevTime][x - 1])*coeff;
 
-    k1[0] = k1[1];
-    k1[nX-2] = k1[nX-1];
+    for (int x = 1; x < nX + 2; x++)
+      k2[x] = (U[prevTime][x + 1] + k1[x + 1]*dt*0.5 - 2.0*U[prevTime][x] -
+          k1[x] * dt + U[prevTime][x - 1] + k1[x - 1] * dt * 0.5)*coeff;
 
-    for (x = 1; x < nX + 2; x++)
-      k2[x] = (U[prevTime][x + 1] + k1[x + 1]*dt*0.5 - 2*U[prevTime][x] - k1[x]*dt + U[prevTime][x - 1]
-          + k1[x - 1]*dt*0.5)/(step*step);
+    for (int x = 1; x < nX + 2; x++)
+      k3[x] = (U[prevTime][x + 1] + k2[x + 1]*dt*0.5 - 2.0*U[prevTime][x] -
+          k2[x]*dt + U[prevTime][x - 1] + k2[x - 1]*dt*0.5)*coeff;
 
-    k2[0] = k2[1];
-    k2[nX-2] = k2[nX-1];
 
-    for (x = 1; x < nX + 2; x++)
-      k3[x] = (U[prevTime][x + 1] + k2[x + 1]*dt*0.5 - 2*U[prevTime][x] - k2[x]*dt + U[prevTime][x - 1] +
-          k2[x - 1]*dt*0.5)/(step*step);
+    for (int x = 1; x < nX + 2; x++)
+      k4[x] = (U[prevTime][x + 1] + k3[x + 1]*dt - 2.0*U[prevTime][x] -
+          k3[x]*dt*2.0 + U[prevTime][x - 1] + k3[x - 1]*dt)*coeff;
 
-    k3[0] = k3[1];
-    k3[nX-2] = k3[nX-1];
-
-    for (x = 1; x < nX + 2; x++)
-      k4[x] = (U[prevTime][x + 1] + k3[x + 1]*dt - 2*U[prevTime][x] - k3[x]*dt*2 + U[prevTime][x - 1] +
-          k3[x - 1]*dt)/(step*step);
-
-    k4[0] = k4[1];
-    k4[nX-2] = k4[nX-1];
-
-    for (x = 1; x < nX + 2; x++)
-      U[curTime][x] = U[prevTime][x] + (k1[x] + 2 * k2[x] + 2 * k3[x] + k4[x])*dt/ 6;
+    for (int x = 1; x < nX + 2; x++)
+      U[curTime][x] = U[prevTime][x] + (k1[x] + 2.0*k2[x] + 2.0*k3[x] + k4[x])*h;
 
     // Задание граничных условий
     if (check == 2) {
@@ -119,20 +118,20 @@ int main() {
 
   }
 
+  double t1 = omp_get_wtime();
   printf("finish!\n");
 
-  fp = fopen("./../../../../result/PetrovRungeKuttaResult.txt", "w");
+  //------------------------------------------------------------------------
+  //                       Вывод результатов и чистка памяти
+  //------------------------------------------------------------------------
 
-  // Вывод результатов
-  for (x = 1; x < nX + 1; x++)
+  printf("time - %.15lf \n", t1 - t0);
+  fp = fopen("./../../../../result/kirillRungeKutta.txt", "w");
+  for (int x = 1; x < nX + 1; x++)
     fprintf(fp, "%.15le\n", U[sizeTime%2][x]);
-
   fclose(fp);
-
-  // Чистка мусора
-  for (t = 0; t < 2; t++) {
-    free(U[t]);
-  }
+  for (int i = 0; i < 2; i++)
+    free(U[i]);
 
   return 0;
 }
