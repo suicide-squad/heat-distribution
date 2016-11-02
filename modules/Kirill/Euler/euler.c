@@ -94,9 +94,9 @@ int main() {
     prevTime = (i + 1) % N;
 
 
-#pragma parallel omp num_threads(2) if (ENABLE_PARALLEL)
+    #pragma parallel omp num_threads(2) if (ENABLE_PARALLEL)
     {
-#pragma omp for nowait
+      #pragma omp for nowait
       for (j = 1; j < nX + 2; j++)
         U[curTime][j] = factor * (U[prevTime][j + 1] - 2.0 * U[prevTime][j] +
             U[prevTime][j - 1]) + U[prevTime][j];
@@ -108,11 +108,11 @@ int main() {
     } else if (check == 1) {
       printf("HZ");
     }
-  }
+  } // for
   double t1 = omp_get_wtime();
 
   //------------------------------------------------------------------------
-  //                      ВЫВОД РЕЗУЬТАТОВ И ЧИСТКА МУСОРА
+  //                      ВЫВОД РЕЗУЛЬТАТОВ И ЧИСТКА МУСОРА
   //------------------------------------------------------------------------
 
   double diffTime = t1-t0;
