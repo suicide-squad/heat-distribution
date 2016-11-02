@@ -4,7 +4,7 @@
 using std::string;
 
 int main(int argc, char** argv) {
-    string filename = "INPUT.txt";
+    string filename = "../../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -22,7 +22,6 @@ int main(int argc, char** argv) {
     double dt = 0.0;
 
     int i, j;
-    int sizeTime = 0;
     int currTime, prevTime;
 
     double step = 0.0;
@@ -37,8 +36,6 @@ int main(int argc, char** argv) {
     fscanf(infile, "dt=%lf\n", &dt);            // delta of time difference
     fscanf(infile, "BC=%d\n", &bc);         // Not using right now
 
-    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
-           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
     double** vect = new double*[2];
     vect[0] = new double[nX + 2];
     vect[1] = new double[nX + 2];
@@ -62,22 +59,26 @@ int main(int argc, char** argv) {
     double* k4Vect = new double[nX + 2];
 
     double expression = sigma / (step * step);
-    //FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
 
-    for (double j = 0; j < tFinal; j += dt) {
+    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
+           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+
+    int timeStep = (int) ((tFinal - tStart) / dt);
+
+    for (double j = 0; j < timeStep; j += 1) {
         // Fill k1 vect
         for (int i = 1; i <= nX; i++) {
-            k1Vect[i] = expression * (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1]);
+            k1Vect[i] = (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression;
         }
         //bounders k1
         k1Vect[0] = k1Vect[1];
         k1Vect[nX + 1] = k1Vect[nX];
 
-        // Fill k2 vect
+        // Fill k2.0 vect
         for (int i = 1; i <= nX; i++) {
-            k2Vect[i] = expression * (vect[prevTime][i + 1]) + (k1Vect[i + 1] * dt / 2)
-                        - (2 * vect[prevTime][i] + k1Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k1Vect[i - 1] * dt / 2;
+            k2Vect[i] = expression * ((vect[prevTime][i + 1]) + (k1Vect[i + 1] * dt / 2.0)
+                        - (2.0 * vect[prevTime][i] + k1Vect[i] * dt)
+                        + vect[prevTime][i - 1] + k1Vect[i - 1] * dt / 2.0);
         }
         // bounders
         k2Vect[0] = k2Vect[1];
@@ -85,9 +86,9 @@ int main(int argc, char** argv) {
 
         // Fill k3 vect
         for (int i = 1; i <= nX; i++) {
-            k3Vect[i] = expression * (vect[prevTime][i + 1]) + (k2Vect[i + 1] * dt / 2)
-                        - (2 * vect[prevTime][i] + k2Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k2Vect[i - 1] * dt / 2;
+            k3Vect[i] = expression * ((vect[prevTime][i + 1]) + (k2Vect[i + 1] * dt / 2.0)
+                        - (2.0 * vect[prevTime][i] + k2Vect[i] * dt)
+                        + vect[prevTime][i - 1] + k2Vect[i - 1] * dt / 2.0);
         }
         // bounders
         k3Vect[0] = k3Vect[1];
@@ -95,9 +96,9 @@ int main(int argc, char** argv) {
 
         // Fill k4 vect
         for (int i = 1; i <= nX; i++) {
-            k4Vect[i] = expression * (vect[prevTime][i + 1]) + (k3Vect[i + 1] * dt)
-                        - (2 * vect[prevTime][i] + k3Vect[i] * 2 * dt)
-                        + vect[prevTime][i - 1] + k3Vect[i - 1] * dt;
+            k4Vect[i] = expression * ((vect[prevTime][i + 1]) + (k3Vect[i + 1] * dt)
+                        - (2.0 * vect[prevTime][i] + k3Vect[i] * 2.0 * dt)
+                        + vect[prevTime][i - 1] + k3Vect[i - 1] * dt);
         }
         // bounders
         k4Vect[0] = k4Vect[1];
@@ -105,10 +106,9 @@ int main(int argc, char** argv) {
 
         // FIll result vector
         for (int i = 1; i <= nX; i++) {
-            vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2*k2Vect[i] + 2*k3Vect[i] + k4Vect[i]));
-            //fprintf(outfile, "%2.15le\t", vect[currTime][i]);
+            vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2.0*k2Vect[i] + 2.0*k3Vect[i] + k4Vect[i]));
+
         }
-//        fprintf(outfile, "\n");
 
         // boundary conditions
         vect[currTime][0] = vect[currTime][1];
