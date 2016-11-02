@@ -56,6 +56,7 @@ int main() {
         printf("Not correct step!");
         exit(-1);
     }
+    int backstep = 1 / (step*step);
 
     // Заполнение функции в нулевой момент времени
     for (i = 1; i < nX - 1; i++) {
@@ -80,7 +81,7 @@ int main() {
         prevTime = (i + 1) % N;
 
         for (j = 1; j < nX + 2; j++)
-            U[curTime][j] = (dt*sigma / (step*step))*(U[prevTime][j - 1] -
+            U[curTime][j] = (dt*sigma * backstep)*(U[prevTime][j - 1] -
             2 * U[prevTime][j] + U[prevTime][j + 1]) + U[prevTime][j];
 
         // Задание граничных условий
@@ -97,7 +98,7 @@ int main() {
 
     printf("finish!\n");
 
-    fp = fopen("C:\\Users\\ролд\\Documents\\Visual Studio 2013\\Projects\\Eiler\\Eiler\\OUTPUT_gonch.txt", "w");
+    fp = fopen("C:\\Users\\ролд\\Documents\\Visual Studio 2013\\Projects\\Eiler\\Eiler\\svetaEuler.txt", "w");
 
     // Вывод результатов
     for (j = 1; j < nX + 1; j++)

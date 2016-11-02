@@ -1,8 +1,11 @@
 import numpy
 import matplotlib.pyplot as plt
 
+import sys
 import os
 import re
+
+from PyQt5.QtWidgets import QFileDialog, QApplication
 
 path = os.path.abspath(os.path.join(os.path.dirname(__file__),
 									"..", "initial", "INPUT.txt"))
@@ -27,15 +30,30 @@ pattern = re.compile('\d+\.?\d*e?[+-]?\d*')
 yStart = numpy.array([float(line) for line in file if pattern.match(line)])
 file.close()
 
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "result", "PetrovRungeKuttaResult.txt"))
-yFinish = numpy.loadtxt(path)
+app = QApplication(sys.argv)
+dialog = QFileDialog()
 
-# Рисование графиков
-plt.plot(x, yStart, label ='start time')
-plt.plot(x, yFinish, label ='end time')
-plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+file, ok = dialog.getOpenFileName(None, 'Выбери файл',
+                                  '/home/kirill/heat-distribution/result',
+                                  'Text files (*.txt)')
+yFinish = numpy.loadtxt(file)
+
+print('Размерность:')
+print(len(x))
+print(len(yFinish))
+try:
+	assert len(x) == len(yFinish)
+	# Рисование графиков
+	plt.plot(x, yStart, label ='start time')
+	plt.plot(x, yFinish, label ='end time')
+
+	plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-plt.xlabel('x', fontsize=14)
-plt.ylabel('U(x)', fontsize=14)
-plt.grid(True) 
-plt.show() 
+	plt.xlabel('x', fontsize=14)
+	plt.ylabel('U(x)', fontsize=14)
+	plt.grid(True) 
+	plt.show()
+except AssertionError:
+	print ('ERROR! Не совпадают размерности!')
+
+sys.exit(app.exec_())
