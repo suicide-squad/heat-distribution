@@ -91,16 +91,16 @@ int main(int argc, char** argv) {
     vect[0][nX+1] = vect[0][nX];
 
     double expression = (sigma * dt) / (step * step);
+    printf("%lf", (sigma * dt) / (step * step));
 
     SparseMatrix matrix;
     matrix.testEuler(nX, expression);
+    matrix.printVectors();
 
     for (double j = 0; j < tFinal; j += dt) {
         matrix.multiplicateVector(vect[prevTime], vect[currTime], nX);
-
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
-
     }
 
     FILE *outfile = fopen("OUTPUT.txt", "w");

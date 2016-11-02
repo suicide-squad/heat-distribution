@@ -71,11 +71,17 @@ double* SparseMatrix::multiplicateVector(vector<double> vect) {
 
 void SparseMatrix::multiplicateVector(double *&vect, double *&result, int size) {
     int index = 0;
+
+    for (int j = 0; j < size; ++j) {
+        result[j] = 0;
+    }
+
     for (int i = 0; i < size; i++){  // iteration FOR RESULT VECTOR!!!
         while (index < pointerE[i]) {
             result[i] += values[index] * vect[columns[index]];
             ++index;
         }
+        result[i] += vect[i];
     }
 }
 
