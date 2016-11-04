@@ -142,7 +142,7 @@ int main() {
 
   // Вывод результатов
   for (int i = 1; i < nX + 1; i++)
-    fprintf(fp, "%.15lf%+.15lfi\n", creal(U[sizeTime%2][i]), cimag(U[sizeTime%2][i]));
+    fprintf(fp, "%.15le%+.15lei\n", creal(U[sizeTime%2][i]), cimag(U[sizeTime%2][i]));
 
   fclose(fp);
 
