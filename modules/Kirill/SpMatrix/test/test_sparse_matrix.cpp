@@ -48,7 +48,7 @@ TEST(can_sum, vectors) {
 
   // Act
   TYPE* result = (TYPE *)malloc(sizeof(TYPE) * N);
-  sum(N, h, &result, U, k1, k2, k3 ,k4);
+  sumV(N, h, &result, U, k1, k2, k3, k4);
 
   // Assert
   TYPE expected_v[] = {5, 6, 11, 3};
