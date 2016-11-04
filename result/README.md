@@ -8,17 +8,16 @@ TIMESIZE = 100000; NX = 5000
 
 Эксперименты проводились при следующих условиях: 
 
+Nomination      |Feature
 ----------------|------------------------
-Series:         |   Intel Core i5-4200U; 
+Series:         |   Intel Core i5-4200U;
 Number of Cores:|    2
 Clock Rate:     |    1600 - 2600 MHz
 Level 1 Cache:  |    128 KB
 Level 2 Cache:  |    512 KB
 Level 3 Cache:  |    3072 KB
-OS| Ubuntu 14.04 LTS x64
-Compiler| gcc 4.9.4
-  
-  
+OS              | Ubuntu 14.04 LTS x64
+Compiler        | gcc 4.9.4
   
 ---
 
