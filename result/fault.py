@@ -18,6 +18,6 @@ array2 = numpy.loadtxt(file)
 
 absoluteFault = max(abs(xi-xj) for xi, xj in zip(array1, array2))
 relativeFault = max(abs(xi-xj)/max(xi, xj) for xi, xj in zip(array1, array2))
-print ("%.15f" % absoluteFault)
-print ("%.15f" % relativeFault)
+print ("абсолютная:	%.15f" % absoluteFault)
+print ("относительная:	%.15f" % relativeFault)
 sys.exit(app.exec_())
