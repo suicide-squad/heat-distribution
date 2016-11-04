@@ -3,6 +3,8 @@
 #include <math.h>
 #include <omp.h>
 
+#define ENABLE_PARALLEL 1
+
 int main() {
   FILE *fp;
 
@@ -88,22 +90,27 @@ int main() {
     prevTime = (t + 1)%N;
 
     // Вычисление ki в данный момент времени
-    for (int x = 1; x < nX + 2; x++)
-      k1[x] = (U[prevTime][x + 1] - 2.0 * U[prevTime][x] + U[prevTime][x - 1])*coeff;
 
+    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
+    for (int x = 1; x < nX + 2; x++)
+      k1[x] = (U[prevTime][x + 1] - 2.0*U[prevTime][x] + U[prevTime][x - 1])*coeff;
+
+    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k2[x] = (U[prevTime][x + 1] + k1[x + 1]*dt*0.5 - 2.0*U[prevTime][x] -
           k1[x] * dt + U[prevTime][x - 1] + k1[x - 1] * dt * 0.5)*coeff;
 
+    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k3[x] = (U[prevTime][x + 1] + k2[x + 1]*dt*0.5 - 2.0*U[prevTime][x] -
           k2[x]*dt + U[prevTime][x - 1] + k2[x - 1]*dt*0.5)*coeff;
 
-
+    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k4[x] = (U[prevTime][x + 1] + k3[x + 1]*dt - 2.0*U[prevTime][x] -
           k3[x]*dt*2.0 + U[prevTime][x - 1] + k3[x - 1]*dt)*coeff;
 
+    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       U[curTime][x] = U[prevTime][x] + (k1[x] + 2.0*k2[x] + 2.0*k3[x] + k4[x])*h;
 
