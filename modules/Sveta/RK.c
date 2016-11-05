@@ -8,6 +8,7 @@
 
 
 
+
 int main() {
     FILE *fp;
 
@@ -16,7 +17,8 @@ int main() {
     int curTime, prevTime;
 
     const int N = 2;
-    double U[N];
+    double** U;
+    U = (double *)malloc((N)*sizeof(double));
 
     double xStart = 0.0, xEnd = 0.0;
     double sigma = 0.0;
