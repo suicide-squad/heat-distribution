@@ -1,10 +1,15 @@
 #include <iostream>
+#include <omp.h>
 #include <cmath>
 
 using std::string;
 
 int main(int argc, char** argv) {
-    string filename = "INPUT.txt";
+
+    // Timing variables
+    double time_S, time_E;  // Time for allocate memory
+
+    string filename = "../../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -50,6 +55,8 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
+    time_S = omp_get_wtime();
+
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
     prevTime = 0;
@@ -74,6 +81,9 @@ int main(int argc, char** argv) {
         currTime = (currTime + 1) % 2;
 
     }
+
+    time_E = omp_get_wtime();
+    printf("Run time %.15lf\n", time_E-time_S);
 
     FILE *outfile = fopen("OUTPUT.txt", "w");
 
