@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <omp.h>
 #include "SparseMatrix.h"
 using std::string;
 
@@ -36,6 +37,11 @@ void fillMatrix(double** &matrix, string filename, int &size) {
 
 int main(int argc, char** argv) {
 
+    // Timing variables
+    double time_S, time_E;  // Time for allocate memory
+
+    // File open
+
     string filename = "../../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
@@ -44,6 +50,7 @@ int main(int argc, char** argv) {
         exit(0);
     }
 
+    // Init variables
     double xStart = 0.0, xEnd = 0.0;
     double sigma = 0.0;
 
@@ -60,6 +67,7 @@ int main(int argc, char** argv) {
     double step = 0.0;
 
     //  File reading
+
     fscanf(infile, "XSTART=%lf\n", &xStart);    // start coordinate
     fscanf(infile, "XEND=%lf\n", &xEnd);        // end coordinate
     fscanf(infile, "SIGMA=%lf\n", &sigma);      // coef of heat conduction
@@ -72,6 +80,8 @@ int main(int argc, char** argv) {
     printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
+    //  Memory allocation
+
     double** vect = new double*[2];
     vect[0] = new double[nX + 2];
     vect[1] = new double[nX + 2];
@@ -82,6 +92,8 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
+    time_S = omp_get_wtime();
+    //  Prev val calculating
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
     prevTime = 0;
@@ -91,17 +103,24 @@ int main(int argc, char** argv) {
     vect[0][nX+1] = vect[0][nX];
 
     double expression = (sigma * dt) / (step * step);
-    printf("%lf", (sigma * dt) / (step * step));
+
+    // Sparse Matrix fill
 
     SparseMatrix matrix;
     matrix.testEuler(nX+2, expression);
+
+    // Calculating
 
     for (double j = 0; j < tFinal; j += dt) {
         matrix.multiplicateVector(vect[prevTime], vect[currTime], nX+2);
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
+    time_E = omp_get_wtime();
+    printf("Run time %.15lf\n", time_E-time_S);
 
+
+    // Output
     FILE *outfile = fopen("OUTPUT.txt", "w");
 
     for (int i = 1; i <= nX; i++) {
