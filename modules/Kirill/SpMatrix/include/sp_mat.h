@@ -6,6 +6,7 @@
 #define SPARSE_SPARSE_H
 
 #define ENABLE_PARALLEL 1
+#define _COMPLEX_
 
 #include <omp.h>
 
@@ -13,7 +14,15 @@
 extern "C" {
 #endif
 
+
+#ifdef _COMPLEX_
+
+#include <complex.h>
+typedef complex TYPE;
+
+#else
 typedef double TYPE;
+#endif
 
 // CSR (Compressed Sparse Rows)
 typedef struct {
