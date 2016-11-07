@@ -38,8 +38,7 @@ void fillMatrix(double** &matrix, string filename, int &size) {
 int main(int argc, char** argv) {
 
     // Timing variables
-    double time_memoryS, time_memoryE;  // Time for allocate memory
-    // double t0 = omp_get_wtime(); // Thanks Petrov
+    double time_S, time_E;  // Time for allocate memory
 
     // File open
 
@@ -82,22 +81,18 @@ int main(int argc, char** argv) {
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
     //  Memory allocation
-    time_memoryS = omp_get_wtime();
 
     double** vect = new double*[2];
-    /*vect[0] = new double[1000000000];
-    vect[1] = new double[1000000000];*/
-    vect[0] = (double *) malloc((1000000000) * sizeof(double));
-    vect[1] = (double *) malloc((1000000000) * sizeof(double));
+    vect[0] = new double[nX + 2];
+    vect[1] = new double[nX + 2];
 
-    time_memoryE = omp_get_wtime();
-    printf("Run time %.15lf\n", time_memoryE - time_memoryS);
-    /*// Read file
+    // Read file
     for (int i = 1; i <= nX; i++) {
         fscanf(infile, "%lf\n", &vect[0][i]);
     }
     fclose(infile);
 
+    time_S = omp_get_wtime();
     //  Prev val calculating
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
@@ -121,7 +116,8 @@ int main(int argc, char** argv) {
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
-
+    time_E = omp_get_wtime();
+    printf("Run time %.15lf\n", time_E-time_S);
 
 
     // Output
@@ -129,5 +125,5 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
-    }*/
+    }
 }
