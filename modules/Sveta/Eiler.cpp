@@ -22,7 +22,7 @@ int main() {
     int nX = 1;
     double tStart = 0.0, tFinal = 0.0;
     double dt = 0.0;
-    unsigned char check = 0;
+    int check = 0;
     double step = 0.0;
 
     if ((fp = fopen("C:\\Users\\ролд\\Documents\\Visual Studio 2013\\Projects\\Eiler\\Eiler\\INPUT.txt", "r")) == NULL) {
@@ -38,9 +38,8 @@ int main() {
     fscanf(fp, "TSTART=%lf\n", &tStart);
     fscanf(fp, "TFINISH=%lf\n", &tFinal);
     fscanf(fp, "dt=%lf\n", &dt);
-    fscanf(fp, "BC=%hhu\n", &check);
+    fscanf(fp, "BC=%d\n", &check);
 
-    nX = 500;
     sizeTime = (int)((tFinal - tStart) / dt);
 
     printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n", xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
@@ -59,7 +58,7 @@ int main() {
     int backstep = 1 / (step*step);
 
     // Заполнение функции в нулевой момент времени
-    for (i = 1; i < nX - 1; i++) {
+    for (i = 1; i < nX + 1; i++) {
         fscanf(fp, "%lf", &U[0][i]);
     }
 
@@ -68,7 +67,7 @@ int main() {
     // Задание граничных условий
     if (check == 2) {
         U[0][0] = U[0][1];
-        U[0][nX - 1] = U[0][nX - 2];
+        U[0][nX + 1] = U[0][nX];
     }
     else if (check == 1) {
         // ???
@@ -87,7 +86,7 @@ int main() {
         // Задание граничных условий
         if (check == 2) {
             U[curTime][0] = U[curTime][1];
-            U[curTime][nX - 1] = U[curTime][nX - 2];
+            U[curTime][nX+1] = U[curTime][nX ];
         }
         else if (check == 1) {
             // ???
@@ -110,6 +109,6 @@ int main() {
     for (i = 0; i < 2; i++) {
         free(U[i]);
     }
-
+    free(U);
     return 0;
 }
