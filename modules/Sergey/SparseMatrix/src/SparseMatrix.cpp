@@ -84,8 +84,9 @@ void SparseMatrix::multiplicateVector(double *&vect, double *&result, int size) 
     }
 }
 
-void SparseMatrix::testEuler(int size, double expr) {
+void SparseMatrix::fillMatrix2Expr(int size, double expr1, double expr2) {
     int index = 0;
+    // TODO 0? Check it.
     values.push_back(1);
     columns.push_back(0);
     pointerB.push_back(index++);
@@ -93,44 +94,15 @@ void SparseMatrix::testEuler(int size, double expr) {
     pointerE.push_back(index);
     for (int i = 1; i < size - 1; ++i) {
 
-        values.push_back(expr);
+        values.push_back(expr1);
         columns.push_back(i-1);
         pointerB.push_back(index++);
 
-        values.push_back(1-2*expr);
+        values.push_back(expr2);
         columns.push_back(i);
         ++index;
 
-        values.push_back(expr);
-        columns.push_back(i+1);
-        ++index;
-
-        pointerE.push_back(index);
-    }
-    values.push_back(1);
-    columns.push_back(size - 1);
-    pointerB.push_back(index++);
-    pointerE.push_back(index);
-}
-
-void SparseMatrix::Rungek1(int size, double expr1, double expr2) {
-    int index = 0;
-    values.push_back(1);
-    columns.push_back(0);
-    pointerB.push_back(index++);
-    // TODO remove this array
-    pointerE.push_back(index);
-    for (int i = 1; i < size - 1; ++i) {
-
-        values.push_back(expr);
-        columns.push_back(i-1);
-        pointerB.push_back(index++);
-
-        values.push_back(1-2*expr);
-        columns.push_back(i);
-        ++index;
-
-        values.push_back(expr);
+        values.push_back(expr1);
         columns.push_back(i+1);
         ++index;
 
