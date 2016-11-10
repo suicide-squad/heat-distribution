@@ -102,18 +102,35 @@ int main(int argc, char** argv) {
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
 
-    double expression = sigma / (step * step);
 
     // Sparse Matrix fill
 
-    SparseMatrix k1;
-    k1.Rungek1(nX+2, expression);
+    double* v_k1 = new double[nX + 2];
+    double* v_k2 = new double[nX + 2];
+    double* v_k3 = new double[nX + 2];
+    double* v_k4 = new double[nX + 2];
 
-    SparseMatrix k2;
-    k2.Rungek2(nX+2, expression);
 
-/*    SparseMatrix matrix;
-    matrix.testEuler(nX+2, expression);
+    SparseMatrix sm_k1;
+    double expression1 = sigma / (step * step);
+    double expression2 = -2.0 * expression1;
+    sm_k1.fillMatrix2Expr(nX + 2, expression1, expression2);
+
+    SparseMatrix sm_k2;
+    double k2expr1 = dt * expression1 * 0.5;
+    double k2expr2 = 1 - 2.0 * k2expr1;
+    sm_k2.fillMatrix2Expr(nX+2, k2expr1, k2expr2);
+
+    SparseMatrix sm_k3;
+    double k3expr1 = k2expr1;
+    double k3expr2 = k2expr1;
+    sm_k3.fillMatrix2Expr(nX+2, k3expr2, k3expr2);
+
+    SparseMatrix sm_k4;
+    double k4expr1 = dt * expression1;
+    double k4expr2 = 1 - 2.0 * k4expr1;
+    sm_k4.fillMatrix2Expr(nX+2, k4expr2, k4expr2);
+
 
     // Calculating
 
