@@ -81,7 +81,6 @@ void SparseMatrix::multiplicateVector(double *&vect, double *&result, int size) 
             result[i] += values[index] * vect[columns[index]];
             ++index;
         }
-        result[i] += vect[i];
     }
 }
 
@@ -98,7 +97,7 @@ void SparseMatrix::testEuler(int size, double expr) {
         columns.push_back(i-1);
         pointerB.push_back(index++);
 
-        values.push_back(-2*expr);
+        values.push_back(1-2*expr);
         columns.push_back(i);
         ++index;
 
