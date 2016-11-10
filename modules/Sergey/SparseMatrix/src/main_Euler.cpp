@@ -103,11 +103,11 @@ int main(int argc, char** argv) {
     vect[0][nX+1] = vect[0][nX];
 
     double expression = (sigma * dt) / (step * step);
-
+    double expression2 = 1.0 - 2.0 * expression;
     // Sparse Matrix fill
 
     SparseMatrix matrix;
-    matrix.testEuler(nX+2, expression);
+    matrix.fillMatrix2Expr(nX+2, expression, expression2);
 
     // Calculating
 
