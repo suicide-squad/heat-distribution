@@ -3,7 +3,7 @@
 
 #include "sp_mat.h"
 
-void initSpMat(spMatrix* mat, int nz, int nRows) {
+void initSpMat(spMatrix *mat, size_t nz, size_t nRows) {
   mat->nz = nz;
   mat->nRows = nRows;
   mat->value = (TYPE *)malloc(sizeof(TYPE) * nz);
@@ -31,10 +31,10 @@ void multMV(TYPE** result, spMatrix mat, TYPE* vec) {
   }
 }
 
-void sum(int N, double h, TYPE **result, TYPE *U, TYPE *k1, TYPE *k2, TYPE *k3, TYPE *k4) {
+void sumV(size_t N, double h, TYPE **result, TYPE *U, TYPE *k1, TYPE *k2, TYPE *k3, TYPE *k4) {
   #pragma omp parallel for num_threads(2) if (ENABLE_PARALLEL)
   for (int i = 0; i < N; i++)
-    (*result)[i] = U[i] + h*(k1[i] + 2*k2[i] + 2*k3[i] + k4[i]);
+    (*result)[i] = U[i] + h*(k1[i] + 2.0*k2[i] + 2.0*k3[i] + k4[i]);
 }
 
 
