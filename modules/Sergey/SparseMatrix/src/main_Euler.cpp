@@ -102,16 +102,11 @@ int main(int argc, char** argv) {
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
 
-    double expression = sigma / (step * step);
+    double expression = (sigma * dt) / (step * step);
 
     // Sparse Matrix fill
 
-    SparseMatrix k1;
-    k1.Rungek1(nX+2, expression);
-
-    SparseMatrix k2;
-    k2.RUngek2(nX+2, expression);
-/*    SparseMatrix matrix;
+    SparseMatrix matrix;
     matrix.testEuler(nX+2, expression);
 
     // Calculating
@@ -129,6 +124,6 @@ int main(int argc, char** argv) {
     FILE *outfile = fopen("OUTPUT.txt", "w");
 
     for (int i = 1; i <= nX; i++) {
-        fprintf(outfile, "%2.15le\n", vect[prevTime][i]);*/
+        fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
     }
 }
