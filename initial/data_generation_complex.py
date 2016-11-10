@@ -15,7 +15,9 @@ massX = arange(xStart, xFinish, step, dtype = float)
 
 massY = [cos(x*pi)*1.0j if -0.5 < x < 0.5 else 0 for x in massX]
 
+l = map(lambda elem: '{:f}{:+f}i'.format(elem.real, elem.imag,massY), massY)
+
 with open('INPUT_COMPLEX.txt', 'a') as file:
-	file.writelines('\n'.join(map(str,massY)))
+	file.writelines('\n'.join(l))
 	file.close()
 	
