@@ -32,13 +32,18 @@ Zim = np.loadtxt('./../result/complex/Im.txt', unpack=True)
 Zre = np.loadtxt('./../result/complex/Re.txt', unpack=True)
 
 
-fig = pylab.figure()
+fig = pylab.figure('complex')
+
+#####################################################################
+#                        PLOTS Im                                   #
+#####################################################################
+
 ax1 = fig.add_subplot(122, projection = '3d')
 ax1.plot_surface(X, Y, Zim,
                  color = 'y',
                  rstride=100,
                  cstride=100,
-                 cmap='coolwarm',
+                 cmap='Oranges',
                  linewidth=0.4)
 
 
@@ -46,16 +51,28 @@ ax1.set_xlabel('TIME')
 ax1.set_ylabel('X')
 ax1.set_zlabel('U(X)')
 
+plt.title('Im')
+
+#####################################################################
+#                        PLOTS Re                                   #
+#####################################################################
+
 ax2 = fig.add_subplot(121, projection = '3d')
+
+
 ax2.plot_surface(X, Y, Zre,
                  color = 'y',
-                 rstride=100,
-                 cstride=100,
-                 cmap='coolwarm',
-                 linewidth=0.4)
+                 rstride=50,
+                 cstride=50,
+                 cmap='Pastel1_r',
+                 linewidth=0.4,
+                 label = 'Re')
+ax2.set_zlabel('some numbers')
 
 ax2.set_xlabel('TIME')
 ax2.set_ylabel('X')
 ax2.set_zlabel('U(X)')
+
+plt.title('Re')
 
 plt.show()
