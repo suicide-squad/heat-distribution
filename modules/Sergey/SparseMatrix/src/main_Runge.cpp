@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
     k1.Rungek1(nX+2, expression);
 
     SparseMatrix k2;
-    k2.RUngek2(nX+2, expression);
+    k2.Rungek2(nX+2, expression);
 
 /*    SparseMatrix matrix;
     matrix.testEuler(nX+2, expression);
