@@ -24,6 +24,8 @@ public:
     double* multiplicateVector(double* &vect);
     void multiplicateVector(double* &vect, double* &result, int size);
     void testEuler(int size, double expr);
+    void Rungek1(int size, double expr);
+    void RUngek2(int size, double expr);
 };
 
 

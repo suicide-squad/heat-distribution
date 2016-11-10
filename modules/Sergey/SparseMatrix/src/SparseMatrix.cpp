@@ -113,3 +113,7 @@ void SparseMatrix::testEuler(int size, double expr) {
     pointerB.push_back(index++);
     pointerE.push_back(index);
 }
+
+void SparseMatrix::Rungek1(int size, double expr) {
+    this->testEuler(size, expr);
+}
