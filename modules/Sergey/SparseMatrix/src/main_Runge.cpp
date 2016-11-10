@@ -134,8 +134,22 @@ int main(int argc, char** argv) {
 
     // Calculating
 
+    double expressionResult = dt / 6;
     for (double j = 0; j < tFinal; j += dt) {
-        matrix.multiplicateVector(vect[prevTime], vect[currTime], nX+2);
+        sm_k1.multiplicateVector(vect[prevTime], v_k1, nX+2);
+        sm_k2.multiplicateVector(v_k1, v_k2, nX+2);
+        sm_k3.multiplicateVector(v_k2, v_k3, nX+2);
+        sm_k4.multiplicateVector(v_k3, v_k4, nX+2);
+
+        // Fill result vector
+        for (int i = 1; i <= nX; i++) {
+            vect[currTime][i] = vect[prevTime][i] +
+                    expressionResult * (v_k1[i] + 2.0 * v_k2[i] + 2.0 * v_k3[i] + v_k4[i]);
+        }
+
+        vect[currTime][0] = vect[currTime][1];
+        vect[currTime][nX+1] = vect[currTime][nX];
+
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
@@ -147,6 +161,6 @@ int main(int argc, char** argv) {
     FILE *outfile = fopen("OUTPUT.txt", "w");
 
     for (int i = 1; i <= nX; i++) {
-        fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }*/
+        fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }
 }
 
