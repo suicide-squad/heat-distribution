@@ -4,20 +4,20 @@
 #include <omp.h>
 
 // OpenMP 4.0
-#define ENABLE_PARALLEL 1
+#define ENABLE_PARALLEL 0
 
 int main() {
   FILE *fp;
+  const int N = 2;
 
-  int sizeTime = 0;
   int curTime, prevTime;
 
-  const int N = 2;
   double *U[N];
+
+  size_t nX, sizeTime;
 
   double xStart = 0.0, xEnd = 0.0;
   double sigma = 0.0;
-  int nX = 1;
   double tStart = 0.0, tFinal = 0.0;
   double dt = 0.0;
   unsigned char check = 0;
@@ -36,18 +36,15 @@ int main() {
   fscanf(fp, "XSTART=%lf\n", &xStart);
   fscanf(fp, "XEND=%lf\n", &xEnd);
   fscanf(fp, "SIGMA=%lf\n", &sigma);
-  fscanf(fp, "NX=%d\n", &nX);
+  fscanf(fp, "NX=%lu\n", &nX);
   fscanf(fp, "TSTART=%lf\n", &tStart);
   fscanf(fp, "TFINISH=%lf\n", &tFinal);
   fscanf(fp, "dt=%lf\n", &dt);
   fscanf(fp, "BC=%hhu\n", &check);
 
-  sizeTime = (int) ((tFinal - tStart) / dt);
+  sizeTime = (size_t) ((tFinal - tStart) / dt);
 
-  printf("XSTART=%lf; XEND=%lf; SIGMA=%lf; NX=%d; TSTART=%lf;"
-             " TFINISH=%lf;"" dt=%lf; BC=%d;\n",
-         xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
-  printf("TIMESIZE = %d; NX = %d\n", sizeTime, nX);
+  printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
 
   for (int i = 0; i < N; i++) {
     U[i] = (double *) malloc((nX + 2) * sizeof(double));
@@ -110,15 +107,19 @@ int main() {
     }
   } // for
   double t1 = omp_get_wtime();
+  printf("finish!\n\n");
 
   //------------------------------------------------------------------------
   //                      ВЫВОД РЕЗУЛЬТАТОВ И ЧИСТКА МУСОРА
   //------------------------------------------------------------------------
 
   double diffTime = t1-t0;
-  printf("finish!\n");
-  printf("time run %.15lf\n", diffTime);
-  printf("Gflops %.15lf\n", 5.0*nX*sizeTime/(diffTime*1000000000));
+  unsigned long long flop = 5*nX*sizeTime;
+  printf("Time\t%.15lf\n", diffTime);
+  printf("Flop\t%.0llu\n", flop);
+  printf("GFlops\t%.15lf\n", 1.0*flop/(diffTime*1000000000.0));
+
+
 
   fp = fopen("./../../../../result/kirillEuler.txt", "w");
 
