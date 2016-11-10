@@ -2,6 +2,8 @@
 // Created by kirill on 10.11.16.
 //
 
+#ifdef _COMPLEX_
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -144,3 +146,5 @@ int final(TYPE *UFin) {
 
   fclose(fp);
 }
+
+#endif
