@@ -39,6 +39,20 @@ ___
 
 Сергей
 
+Характеристики компьютера:
+
+|           Item           |       Description      |
+|:------------------------:|:----------------------:|
+|     Processor number     |        i7-2600K        |
+|      Number of cores     |            4           |
+| Processor Base Frequency |        3.40 GHz        |
+|       Level 1 Cache      | 32 KB + 32 KB per core |
+|       Level 2 Cache      |     256 KB per core    |
+|       Level 3 Cache      |       8 MB total       |
+|            OS            |  ubuntu 16.04 LTS x64  |
+|         Compiler         |        gcc 5.4.0       |
+---
+
  № |        Название метода         | Время  |
 ---|:-------------------------------|:------:|
 1  | Последовательный Эйлер         |0,28 |
