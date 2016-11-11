@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
     for (double j = 0; j < tFinal; j += dt) {
 
-        omp_set_num_threads(4);
+        omp_set_num_threads(2);
         //pragma omp parallel num_threads(4)
         {
             #pragma omp parallel for if (ENABLE_PARALLEL)
