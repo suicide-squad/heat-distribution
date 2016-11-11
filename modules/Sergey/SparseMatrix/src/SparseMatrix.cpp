@@ -72,10 +72,13 @@ double* SparseMatrix::multiplicateVector(vector<double> vect) {
 void SparseMatrix::multiplicateVector(double *&vect, double *&result, int size) {
     int index = 0;
 
+    omp_set_num_threads(2);
+    #pragma omp parallel for if (ENABLE_PARALLEL)
     for (int j = 0; j < size; ++j) {
         result[j] = 0;
     }
 
+    #pragma omp parallel for if (ENABLE_PARALLEL)
     for (int i = 0; i < size; i++){  // iteration FOR RESULT VECTOR!!!
         while (index < pointerE[i]) {
             result[i] += values[index] * vect[columns[index]];

@@ -6,7 +6,9 @@
 #define SPARSEMATRIX_SPARSEMATRIX_H
 #include <vector>
 #include <algorithm>
+#include <omp.h>
 
+const int ENABLE_PARALLEL = 0;
 using std::vector;
 
 class SparseMatrix {

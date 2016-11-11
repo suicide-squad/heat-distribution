@@ -7,6 +7,7 @@
 #include "SparseMatrix.h"
 using std::string;
 
+
 vector<double> fillVect();
 void fillMatrix(double** &matrix, string filename, int &size) {
     FILE *infile = fopen(filename.c_str(), "r");
