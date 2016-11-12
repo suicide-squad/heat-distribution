@@ -4,7 +4,7 @@
 #include <omp.h>
 
 // OpenMP 4.0
-#define ENABLE_PARALLEL 0
+#define ENABLE_PARALLEL 1
 
 int main() {
   FILE *fp;
@@ -70,7 +70,7 @@ int main() {
   // Задание граничных условий
   if (check == 2) {
     U[0][0] = U[0][1];
-    U[0][nX - 1] = U[0][nX - 2];
+    U[0][nX + 1] = U[0][nX];
   } else if (check == 1) {
     // ???
     printf("HZ");
@@ -101,7 +101,7 @@ int main() {
     // Задание граничных условий
     if (check == 2) {
       U[curTime][0] = U[curTime][1];
-      U[curTime][nX - 1] = U[curTime][nX - 2];
+      U[curTime][nX + 1] = U[curTime][nX];
     } else if (check == 1) {
       printf("HZ");
     }
