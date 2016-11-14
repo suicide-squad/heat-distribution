@@ -1,13 +1,14 @@
 //
+
 // Created by kirill on 10.11.16.
 //
-
-#ifdef _COMPLEX_
-
 #include <stdio.h>
 #include <math.h>
+
 #include <stdlib.h>
 #include <sp_mat.h>
+
+#ifdef _COMPLEX_
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE);
@@ -113,13 +114,12 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart,
   // Заполнение функции в нулевой момент времени
   for(int i = 0; i < nX; i++) {
     fscanf(fp, "%lf", &re);
-    U[0][i] = CMPLX(re, 0);
+    (*U)[i] = CMPLX(re, 0);
   }
   fclose(fp);
 
   return 0;
 }
-
 void createSpMat(spMatrix *mat, TYPE coeff) {
 
   initSpMat(mat, nX, nX);
@@ -136,7 +136,6 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
   }
 
 }
-
 int final(TYPE *UFin) {
   FILE *fp;
   fp = fopen("./../../../../result/complex/EulerSparse.txt", "w");
