@@ -10,9 +10,11 @@
 
 const int ENABLE_PARALLEL = 0;
 
+
 class SparseMatrix {
 private:
     int _size;
+    int _rows;
     double* values;
     int* columns;
     int* pointerB;
@@ -21,6 +23,7 @@ public:
     SparseMatrix(int size, int rows) ;
     void multiplicateVector(double* &vect, double* &result, int size);
     void fillMatrix2Expr(int size, double expr1, double expr2);
+    void printVectors();
 };
 
 
