@@ -139,7 +139,7 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
 
 int final(TYPE *UFin) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillEulerSparseComplex.txt", "w");
+  fp = fopen("./../../../../result/complex/EulerSparse.txt", "w");
 
   for (int i = 0; i < nX; i++)
     fprintf(fp, "%.15le\t%+.15lei\n", creal(UFin[i]), cimag(UFin[i]));

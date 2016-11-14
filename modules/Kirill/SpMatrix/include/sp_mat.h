@@ -6,7 +6,7 @@
 #define SPARSE_SPARSE_H
 
 #define ENABLE_PARALLEL 1
-//#define _COMPLEX_
+#define _COMPLEX_
 
 #include <omp.h>
 
