@@ -10,21 +10,17 @@
 
 const int ENABLE_PARALLEL = 0;
 
-
-class SparseMatrix {
-private:
+typedef struct SparseMatrix {
     int _size;
     int _rows;
-    double* values;
-    int* columns;
-    int* pointerB;
+    double *values;
+    int *columns;
+    int *pointerB;
+} SpaceMatrix;
 
-public:
-    SparseMatrix(int size, int rows) ;
-    void multiplicateVector(double* &vect, double* &result, int size);
-    void fillMatrix2Expr(int size, double expr1, double expr2);
-    void printVectors();
-};
-
+void fillMatrix2Expr(SparseMatrix &sp, int size, double expr1, double expr2);
+void multiplicateVector(SparseMatrix &sp, double *&vect, double *&result, int size);
+void spMatrixInit(SparseMatrix &sp, int size, int rows);
+void printVectors(SparseMatrix &sp);
 
 #endif //SPARSEMATRIX_SPARSEMATRIX_H

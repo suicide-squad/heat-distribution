@@ -80,14 +80,15 @@ int main(int argc, char** argv) {
     double expression2 = 1.0 - 2.0 * expression;
     // Sparse Matrix fill
 
-    SparseMatrix matrix(nX * 3 + 2, nX + 2);
-    matrix.fillMatrix2Expr(nX+2, expression, expression2);
+    SparseMatrix matrix;
+    spMatrixInit(matrix, nX * 3 + 2, nX + 2);
+    fillMatrix2Expr(matrix, nX+2, expression, expression2);
 
     // Calculating
     time_S = omp_get_wtime();
 
     for (double j = 0; j < tFinal; j += dt) {
-        matrix.multiplicateVector(vect[prevTime], vect[currTime], nX+2);
+        multiplicateVector(matrix, vect[prevTime], vect[currTime], nX+2);
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
