@@ -4,35 +4,9 @@
 
 #include <iostream>
 #include <omp.h>
+#include <cmath>
 #include "SparseMatrix.h"
 using std::string;
-
-vector<double> fillVect();
-void fillMatrix(double** &matrix, string filename, int &size) {
-    FILE *infile = fopen(filename.c_str(), "r");
-
-    if (infile == NULL) {
-        printf("File reading error. Try to relocate input file\n");
-        exit(0);
-    }
-
-    // Scan size of matrix.
-    fscanf(infile, "size=%d", &size);
-    if (size == 0 || size < 0) {
-        printf("Error, wrong size");
-        exit(0);
-    }
-
-    matrix = new double*[size];
-    for (int i = 0; i < size; ++i) {
-        matrix[i] = new double[size];
-        for (int j = 0; j < size; ++j) {
-            fscanf(infile, "%lf", &matrix[i][j]);
-        }
-    }
-    fclose(infile);
-}
-
 
 
 int main(int argc, char** argv) {
@@ -111,22 +85,22 @@ int main(int argc, char** argv) {
     double* v_k4 = new double[nX + 2];
 
 
-    SparseMatrix sm_k1;
+    SparseMatrix sm_k1(nX * 3 + 2, nX + 2);
     double expression1 = sigma / (step * step);
     double expression2 = -2.0 * expression1;
     sm_k1.fillMatrix2Expr(nX + 2, expression1, expression2);
 
-    SparseMatrix sm_k2;
+    SparseMatrix sm_k2(nX * 3 + 2, nX + 2);
     double k2expr1 = dt * expression1 * 0.5;
     double k2expr2 = 1 - 2.0 * k2expr1;
     sm_k2.fillMatrix2Expr(nX+2, k2expr1, k2expr2);
 
-    SparseMatrix sm_k3;
+    SparseMatrix sm_k3(nX * 3 + 2, nX + 2);
     double k3expr1 = k2expr1;
     double k3expr2 = k2expr1;
     sm_k3.fillMatrix2Expr(nX+2, k3expr2, k3expr2);
 
-    SparseMatrix sm_k4;
+    SparseMatrix sm_k4(nX * 3 + 2, nX + 2);
     double k4expr1 = dt * expression1;
     double k4expr2 = 1 - 2.0 * k4expr1;
     sm_k4.fillMatrix2Expr(nX+2, k4expr2, k4expr2);
