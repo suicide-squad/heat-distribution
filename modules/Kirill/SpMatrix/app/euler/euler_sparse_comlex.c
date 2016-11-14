@@ -138,6 +138,7 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart,
 
   return 0;
 }
+
 void createSpMat(spMatrix *mat, TYPE coeff) {
 
   initSpMat(mat, nX, nX);

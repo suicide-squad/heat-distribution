@@ -12,6 +12,8 @@
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE);
+
+void printInFile(TYPE *UFin, FILE* fpRe, FILE* fpIm);
 int final(TYPE *);
 
 size_t nX;
@@ -43,11 +45,15 @@ int main() {
   spMatrix A1;
   complex k1exp = CMPLX(0., 1.);
 
+  printf("%lf\t%+.lfi\n", creal(k1exp), cimag(k1exp));
+
   createSpMat(&A1, k1exp);
 
   spMatrix A2;
 
   complex k2exp = CMPLX(1., dt*0.5);
+
+  printf("%.15lf\t%+.15lfi\n", creal(k2exp), cimag(k2exp));
 
   createSpMat(&A2, k2exp);
 
@@ -55,13 +61,20 @@ int main() {
 
   complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
 
+  printf("%.15lf\t%+.15lfi\n", creal(k3exp), cimag(k3exp));
+
   createSpMat(&A3, k3exp);
 
   spMatrix A4;
 
   complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
 
+  printf("%.15lf\t%+.15lfi\n", creal(k4exp), cimag(k4exp));
+
   createSpMat(&A4, k4exp);
+
+  FILE* fpRe = fopen("./../../../../result/complex/Re.txt", "w");
+  FILE* fpIm = fopen("./../../../../result/complex/Im.txt", "w");
 
   // -----------------------------------------------------------------------
   //                              Вычисления
@@ -75,6 +88,8 @@ int main() {
   TYPE* k4 = (TYPE*)malloc(sizeof(TYPE) * nX);
 
   TYPE* tmp;
+
+  printInFile(U, fpRe, fpIm);
 
   double t0 = omp_get_wtime();
   for (int i = 1; i <= sizeTime; i++) {
@@ -93,8 +108,15 @@ int main() {
     tmp = U;
     U = UNext;
     UNext = tmp;
+
+    if ( i%10000 == 0 )
+      printInFile(U, fpRe, fpIm);
   }
   double t1 = omp_get_wtime();
+
+  fclose(fpRe);
+  fclose(fpIm);
+
   printf("finish!\n\n");
 
   //------------------------------------------------------------------------
@@ -172,6 +194,16 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
   }
 
 }
+
+void printInFile(TYPE *UFin, FILE* fpRe, FILE* fpIm) {
+  for (int i = 0; i < nX; i++) {
+    fprintf(fpRe, "%lf ", creal(UFin[i]));
+    fprintf(fpIm, "%lf ", cimag(UFin[i]));
+  }
+  fprintf(fpRe, "\n");
+  fprintf(fpIm, "\n ");
+}
+
 int final(TYPE *UFin) {
   FILE *fp;
   fp = fopen("./../../../../result/complex/RungeSparse.txt", "w");
