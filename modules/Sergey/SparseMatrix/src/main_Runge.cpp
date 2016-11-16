@@ -67,7 +67,6 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
-    time_S = omp_get_wtime();
     //  Prev val calculating
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
@@ -102,7 +101,7 @@ int main(int argc, char** argv) {
     SparseMatrix sm_k3;
     spMatrixInit(sm_k3, nX * 3 + 2, nX + 2);
     double k3expr1 = k2expr1;
-    double k3expr2 = k2expr1;
+    double k3expr2 = k2expr2;
     fillMatrix2Expr(sm_k3, nX+2, k3expr1, k3expr2);
 
     SparseMatrix sm_k4;
@@ -114,6 +113,7 @@ int main(int argc, char** argv) {
 
     // Calculating
 
+    time_S = omp_get_wtime();
     double expressionResult = dt / 6;
     for (double j = 0; j < tFinal; j += dt) {
         multiplicateVector(sm_k1, vect[prevTime], v_k1, nX+2);
