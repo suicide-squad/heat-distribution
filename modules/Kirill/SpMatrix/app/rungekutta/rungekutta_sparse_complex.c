@@ -59,7 +59,8 @@ int main() {
 
   spMatrix A3;
 
-  complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
+//  complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
+complex k3exp = k2exp;
 
   printf("%.15lf\t%+.15lfi\n", creal(k3exp), cimag(k3exp));
 
@@ -67,8 +68,8 @@ int main() {
 
   spMatrix A4;
 
-  complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
-
+//  complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
+complex k4exp = CMPLX(1., dt);
   printf("%.15lf\t%+.15lfi\n", creal(k4exp), cimag(k4exp));
 
   createSpMat(&A4, k4exp);

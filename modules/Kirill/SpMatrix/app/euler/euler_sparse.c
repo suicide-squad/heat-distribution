@@ -8,7 +8,7 @@
 #include <sp_mat.h>
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
-void createSpMat(spMatrix *, TYPE);
+void createSpMat(spMatrix *, TYPE, TYPE);
 int final(TYPE *);
 
 size_t nX;
@@ -47,7 +47,7 @@ int main() {
   spMatrix A;
   double coeff1 = dt/(step*step);
   double coeff2 = 1 - 2.0*coeff1;
-  createSpMat(&A, coeff1);
+  createSpMat(&A, coeff1, coeff2);
 
   // -----------------------------------------------------------------------
   //                              Вычисления
@@ -78,12 +78,12 @@ int main() {
   printf("Flop\t%.0llu\n", flop);
   printf("GFlops\t%.15lf\n", flop*1.0/(diffTime*1000000000.0));
 
-  final(&U);
+  final(U);
 
-//  free(U);
+  free(U);
   free(UNext);
 
-//  freeSpMat(&A);
+  freeSpMat(&A);
   return 0;
 
 }
@@ -126,9 +126,9 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   return 0;
 }
 
-void createSpMat(spMatrix *mat, TYPE coeff) {
+void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
 
-  initSpMat(mat, nX*3, nX + 3);
+  initSpMat(mat, nX*3 + 2, nX + 3);
 
   int j = 0;
     mat->value[0] = 1.0;          mat->col[0] = 0;
@@ -152,7 +152,7 @@ int final(TYPE *UFin) {
   fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
 
   for (int i = 1; i < nX + 1; i++)
-    fprintf(fp, "%.15le\n", (*UFin)[i]);
+    fprintf(fp, "%.15le\n", UFin[i]);
 
   fclose(fp);
 }

@@ -9,7 +9,7 @@
 #include "sp_mat.h"
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
-void createSpMat(spMatrix *, TYPE);
+void createSpMat(spMatrix *, TYPE, TYPE);
 int final(TYPE *);
 
 size_t nX;
@@ -49,17 +49,17 @@ int main() {
   spMatrix A;
   double coeff1 = 1.0/(step*step);
   double coeff2 = -2.0*coeff1;
-  createSpMat(&A, coeff1);
+  createSpMat(&A, coeff1, coeff2);
 
   spMatrix B;
   coeff1 = dt*coeff1*0.5;
   coeff2 = 1.0 - 2.0*coeff1;
-  createSpMat(&B, coeff1);
+  createSpMat(&B, coeff1, coeff2);
 
   spMatrix C;
   coeff1 = coeff1*2.0;
   coeff2 = 1.0 - 2.0*coeff1;
-  createSpMat(&C, coeff1);
+  createSpMat(&C, coeff1, coeff2);
 
   // -----------------------------------------------------------------------
   //                         Вычисления
@@ -110,7 +110,7 @@ int main() {
   printf("Flop\t%.0llu\n", flop);
   printf("GFlops\t%.15lf\n", flop*1.0/(diffTime*1000000000.0));
 
-  final(&U);
+  final(U);
 
   free(U);
   free(UNext);
@@ -163,15 +163,15 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   return 0;
 }
 
-void createSpMat(spMatrix *mat, TYPE coeff) {
+void createSpMat(spMatrix *mat, TYPE coeff1, TYPE coeff2) {
 
   initSpMat(mat, nX*3, nX + 3);
 
   int j = 0;
   for (int i = 0; i < 3*nX; i += 3) {
-    mat->value[i] = coeff;       mat->col[i] = j++;
+    mat->value[i] = coeff1;       mat->col[i] = j++;
     mat->value[i + 1] = coeff2;   mat->col[i + 1] = j++;
-    mat->value[i + 2] = coeff;   mat->col[i + 2] = j--;
+    mat->value[i + 2] = coeff1;   mat->col[i + 2] = j--;
   }
 
   mat->rowIndex[0] = 0;
@@ -187,7 +187,7 @@ int final(TYPE *UFin) {
   fp = fopen("./../../../../result/kirillRungeKuttaSparse.txt", "w");
 
   for (int i = 1; i < nX + 1; i++)
-    fprintf(fp, "%.15le\n", (*UFin)[i]);
+    fprintf(fp, "%.15le\n", UFin[i]);
 
   fclose(fp);
 }
