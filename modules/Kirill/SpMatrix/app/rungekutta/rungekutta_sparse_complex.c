@@ -33,7 +33,7 @@ int main() {
 
   init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U);
 
-  double step = fabs(xStart - xEnd) / nX;
+  // double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
 
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
@@ -45,32 +45,25 @@ int main() {
   spMatrix A1;
   complex k1exp = CMPLX(0., 1.);
 
-  printf("%lf\t%+.lfi\n", creal(k1exp), cimag(k1exp));
-
   createSpMat(&A1, k1exp);
 
   spMatrix A2;
 
   complex k2exp = CMPLX(1., dt*0.5);
 
-  printf("%.15lf\t%+.15lfi\n", creal(k2exp), cimag(k2exp));
-
   createSpMat(&A2, k2exp);
 
   spMatrix A3;
 
-//  complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
-complex k3exp = k2exp;
-
-  printf("%.15lf\t%+.15lfi\n", creal(k3exp), cimag(k3exp));
+  complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
+//complex k3exp = k2exp;
 
   createSpMat(&A3, k3exp);
 
   spMatrix A4;
 
-//  complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
-complex k4exp = CMPLX(1., dt);
-  printf("%.15lf\t%+.15lfi\n", creal(k4exp), cimag(k4exp));
+  complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
+//complex k4exp = CMPLX(1., dt);
 
   createSpMat(&A4, k4exp);
 
@@ -90,6 +83,8 @@ complex k4exp = CMPLX(1., dt);
 
   TYPE* tmp;
 
+  double h = dt/6.0;
+
   printInFile(U, fpRe, fpIm);
 
   double t0 = omp_get_wtime();
@@ -105,6 +100,9 @@ complex k4exp = CMPLX(1., dt);
 
     // k4 = A4*k3
     multMV(&k4, A4, k3);
+
+    // UNext = U + (k1 + k2*2 + k3*2 + k4)*h;
+    sumV(nX + 2, h, &UNext, U, k1, k2, k3, k4);
 
     tmp = U;
     U = UNext;
