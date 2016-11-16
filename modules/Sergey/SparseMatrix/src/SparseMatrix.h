@@ -4,29 +4,23 @@
 
 #ifndef SPARSEMATRIX_SPARSEMATRIX_H
 #define SPARSEMATRIX_SPARSEMATRIX_H
-#include <vector>
-#include <algorithm>
+#include <omp.h>
+#include <cstdio>
 
-using std::vector;
 
-class SparseMatrix {
-private:
-    vector<double> values;
-    vector<int> columns;
-    vector<int> pointerB;
-    vector<int> pointerE;
+const int ENABLE_PARALLEL = 0;
 
-public:
-    SparseMatrix() {};
-    void fillMatrix(double** &matrix, int widthSize, int heightSize);
-    void printVectors();
-    double* multiplicateVector(vector<double> vect);
-    double* multiplicateVector(double* &vect);
-    void multiplicateVector(double* &vect, double* &result, int size);
-    void testEuler(int size, double expr);
-    void fillMatrix2Expr(int size, double expr1, double expr2);
-    void Rungek2(int size, double expr);
-};
+typedef struct SparseMatrix {
+    int _size;
+    int _rows;
+    double *values;
+    int *columns;
+    int *pointerB;
+} SpaceMatrix;
 
+void fillMatrix2Expr(SparseMatrix &sp, int size, double expr1, double expr2);
+void multiplicateVector(SparseMatrix &sp, double *&vect, double *&result, int size);
+void spMatrixInit(SparseMatrix &sp, int size, int rows);
+void printVectors(SparseMatrix &sp);
 
 #endif //SPARSEMATRIX_SPARSEMATRIX_H
