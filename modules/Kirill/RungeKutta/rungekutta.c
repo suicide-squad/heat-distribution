@@ -66,7 +66,7 @@ int main() {
   // Задание граничных условий
   if (check == 2) {
     U[0] = U[1];
-    U[nX - 1] = U[nX -2];
+    U[nX + 1] = U[nX];
   } else if (check == 1) {
     // ???
     printf("HZ");
@@ -94,20 +94,32 @@ int main() {
     for (int x = 1; x < nX + 2; x++)
       k1[x] = (U[x + 1] - 2.0*U[x] + U[x - 1])*coeff;
 
+    k1[0] = k1[1];
+    k1[nX + 1] = k1[nX];
+
     #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k2[x] = (U[x + 1] + k1[x + 1]*dt*0.5 - 2.0*U[x] -
           k1[x]*dt + U[x - 1] + k1[x - 1]*dt*0.5)*coeff;
+
+    k2[0] = k2[1];
+    k2[nX + 1] = k2[nX];
 
     #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k3[x] = (U[x + 1] + k2[x + 1]*dt*0.5 - 2.0*U[x] -
           k2[x]*dt + U[x - 1] + k2[x - 1]*dt*0.5)*coeff;
 
+    k3[0] = k3[1];
+    k3[nX + 1] = k3[nX];
+
     #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k4[x] = (U[x + 1] + k3[x + 1]*dt - 2.0*U[x] -
           k3[x]*dt*2.0 + U[x - 1] + k3[x - 1]*dt)*coeff;
+
+    k4[0] = k4[1];
+    k4[nX + 1] = k4[nX];
 
     #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
@@ -116,7 +128,7 @@ int main() {
     // Задание граничных условий
     if (check == 2) {
       Unext[0] = Unext[1];
-      Unext[nX - 1] = Unext[nX -2];
+      Unext[nX + 1] = Unext[nX];
     } else if (check == 1) {
       // ???
       printf("HZ");

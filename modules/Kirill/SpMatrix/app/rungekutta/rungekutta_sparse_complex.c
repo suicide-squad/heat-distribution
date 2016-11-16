@@ -1,14 +1,19 @@
 //
-// Created by kirill on 24.10.16.
+// Created by kirill on 14.11.16.
 //
 
 #include <stdio.h>
 #include <math.h>
+
 #include <stdlib.h>
 #include <sp_mat.h>
 
+#ifdef _COMPLEX_
+
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
-void createSpMat(spMatrix *, TYPE, TYPE);
+void createSpMat(spMatrix *, TYPE);
+
+void printInFile(TYPE *UFin, FILE* fpRe, FILE* fpIm);
 int final(TYPE *);
 
 size_t nX;
@@ -28,15 +33,8 @@ int main() {
 
   init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U);
 
-  double step = fabs(xStart - xEnd) / nX;
+  // double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
-  if (2 * sigma * dt > step * step) {
-    printf("Выбор шага по времени не возможен в силу условия устойчивости!\n");
-    printf("%.10lf > %.10lf\n", 2 * sigma * dt, step * step);
-    printf("Предлагаю взять dt = %.10lf\n", step * step / (2.0 * sigma));
-
-    return -1;
-  }
 
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
 
@@ -44,28 +42,80 @@ int main() {
   //              Заполнение значений и номера столбцов матрицы
   //------------------------------------------------------------------------
 
-  spMatrix A;
-  double coeff1 = dt/(step*step);
-  double coeff2 = 1 - 2.0*coeff1;
-  createSpMat(&A, coeff1, coeff2);
+  spMatrix A1;
+  complex k1exp = CMPLX(0., 1.);
+
+  createSpMat(&A1, k1exp);
+
+  spMatrix A2;
+
+  complex k2exp = CMPLX(1., dt*0.5);
+
+  createSpMat(&A2, k2exp);
+
+  spMatrix A3;
+
+  complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
+//complex k3exp = k2exp;
+
+  createSpMat(&A3, k3exp);
+
+  spMatrix A4;
+
+  complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
+//complex k4exp = CMPLX(1., dt);
+
+  createSpMat(&A4, k4exp);
+
+  FILE* fpRe = fopen("./../../../../result/complex/Re.txt", "w");
+  FILE* fpIm = fopen("./../../../../result/complex/Im.txt", "w");
 
   // -----------------------------------------------------------------------
   //                              Вычисления
   //------------------------------------------------------------------------
 
-  TYPE* UNext = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
+  TYPE* UNext = (TYPE*)malloc(sizeof(TYPE) * nX);
+
+  TYPE* k1 = (TYPE*)malloc(sizeof(TYPE) * nX);
+  TYPE* k2 = (TYPE*)malloc(sizeof(TYPE) * nX);
+  TYPE* k3 = (TYPE*)malloc(sizeof(TYPE) * nX);
+  TYPE* k4 = (TYPE*)malloc(sizeof(TYPE) * nX);
+
   TYPE* tmp;
+
+  double h = dt/6.0;
+
+  printInFile(U, fpRe, fpIm);
 
   double t0 = omp_get_wtime();
   for (int i = 1; i <= sizeTime; i++) {
-    // UNext = A*U
-    multMV(&UNext, A, U);
+    // k1 = A1*U
+    multMV(&k1, A1, U);
+
+    // k2 = A2*k1
+    multMV(&k2, A2, k1);
+
+    // k3 = A3*k2
+    multMV(&k3, A3, k2);
+
+    // k4 = A4*k3
+    multMV(&k4, A4, k3);
+
+    // UNext = U + (k1 + k2*2 + k3*2 + k4)*h;
+    sumV(nX + 2, h, &UNext, U, k1, k2, k3, k4);
 
     tmp = U;
     U = UNext;
     UNext = tmp;
+
+    if ( i%10000 == 0 )
+      printInFile(U, fpRe, fpIm);
   }
   double t1 = omp_get_wtime();
+
+  fclose(fpRe);
+  fclose(fpIm);
+
   printf("finish!\n\n");
 
   //------------------------------------------------------------------------
@@ -73,17 +123,17 @@ int main() {
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-  unsigned long long flop = (2*3*nX + 2*2)*sizeTime;
   printf("Time\t%.15lf\n", diffTime);
-  printf("Flop\t%.0llu\n", flop);
-  printf("GFlops\t%.15lf\n", flop*1.0/(diffTime*1000000000.0));
 
   final(U);
 
   free(U);
   free(UNext);
 
-  freeSpMat(&A);
+  freeSpMat(&A1);
+  freeSpMat(&A2);
+  freeSpMat(&A3);
+  freeSpMat(&A4);
   return 0;
 
 }
@@ -91,15 +141,14 @@ int main() {
 /*
 ____________________________________________________________________________
 
-
                           РЕАЛИЗАЦИЯ ФУНКЦИЙ
-
  ____________________________________________________________________________
 
 */
 
 
-int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tFinal, double *dt, int *check, TYPE **U) {
+int init(double *xStart, double *xEnd, double *sigma, double *tStart,
+         double *tFinal, double *dt, int *check, TYPE **U) {
   FILE *fp;
   if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
@@ -115,44 +164,53 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   fscanf(fp, "dt=%lf\n", dt);
   fscanf(fp, "BC=%d\n", check);
 
-  *U = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
+  *U = (TYPE *) malloc(sizeof(TYPE) * nX);
+
+  double re, im = 0.;
 
   // Заполнение функции в нулевой момент времени
-  for (int i = 1; i < nX - 1; i++)
-    fscanf(fp, "%lf", &(*U)[i]);
-  (*U)[0] = (*U)[nX + 1] = 0.0;
+  for(int i = 0; i < nX; i++) {
+    fscanf(fp, "%lf", &re);
+    (*U)[i] = CMPLX(re, 0);
+  }
   fclose(fp);
 
   return 0;
 }
+void createSpMat(spMatrix *mat, TYPE coeff) {
 
-void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
-
-  initSpMat(mat, nX*3 + 2, nX + 3);
+  initSpMat(mat, nX, nX);
 
   int j = 0;
-    mat->value[0] = 1.0;          mat->col[0] = 0;
-  for (int i = 1; i < 3*nX + 1; i += 3) {
-    mat->value[i] = coeff;       mat->col[i] = j++;
-    mat->value[i + 1] = coeff2;   mat->col[i + 1] = j++;
-    mat->value[i + 2] = coeff;   mat->col[i + 2] = j--;
+  for (int i = 0; i < nX; i ++) {
+    mat->value[i] = coeff;
+    mat->col[i] = j++;
   }
-    mat->value[nX*3 + 1] = 1.0;   mat->col[3*nX + 1]  = (int)nX + 1;
 
   mat->rowIndex[0] = 0;
-  mat->rowIndex[1] = 1;
-  for (int i = 2; i < nX + 2; i++) {
-    mat->rowIndex[i] = mat->rowIndex[i - 1] + 3;
+  for (int i = 1; i < nX + 1; i++) {
+    mat->rowIndex[i] = i;
   }
-  mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 1;
+
+}
+
+void printInFile(TYPE *UFin, FILE* fpRe, FILE* fpIm) {
+  for (int i = 0; i < nX; i++) {
+    fprintf(fpRe, "%lf ", creal(UFin[i]));
+    fprintf(fpIm, "%lf ", cimag(UFin[i]));
+  }
+  fprintf(fpRe, "\n");
+  fprintf(fpIm, "\n ");
 }
 
 int final(TYPE *UFin) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
+  fp = fopen("./../../../../result/complex/RungeSparse.txt", "w");
 
-  for (int i = 1; i < nX + 1; i++)
-    fprintf(fp, "%.15le\n", UFin[i]);
+  for (int i = 0; i < nX; i++)
+    fprintf(fp, "%.15le\t%+.15lei\n", creal(UFin[i]), cimag(UFin[i]));
 
   fclose(fp);
 }
+
+#endif
