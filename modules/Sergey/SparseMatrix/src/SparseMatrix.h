@@ -8,8 +8,6 @@
 #include <cstdio>
 
 
-const int ENABLE_PARALLEL = 0;
-
 typedef struct SparseMatrix {
     int _size;
     int _rows;

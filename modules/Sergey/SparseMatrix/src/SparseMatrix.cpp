@@ -4,6 +4,7 @@
 
 #include "SparseMatrix.h"
 
+const int ENABLE_PARALLEL = 1;
 
 void spMatrixInit(SparseMatrix &sp, int size, int rows) {
     sp._size = size;
@@ -14,20 +15,16 @@ void spMatrixInit(SparseMatrix &sp, int size, int rows) {
 }
 
 void multiplicateVector(SparseMatrix &sp, double *&vect, double *&result, int size) {
-    int index = 0;
 
-    omp_set_num_threads(2);
-    //#pragma omp parallel for if (ENABLE_PARALLEL)
-    for (int j = 0; j < size; ++j) {
-        result[j] = 0;
-    }
+    omp_set_num_threads(4);
 
-    //#pragma omp parallel for if (ENABLE_PARALLEL)
+    #pragma omp parallel for if (ENABLE_PARALLEL)
     for (int i = 0; i < size; i++){  // iteration FOR RESULT VECTOR!!!
-        while (index < sp.pointerB[i+1]) {
-            result[i] += sp.values[index] * vect[sp.columns[index]];
-            ++index;
+        double local_result = 0;
+        for (int j = sp.pointerB[i]; j < sp.pointerB[i+1]; j++) {
+            local_result += sp.values[j] * vect[sp.columns[j]];
         }
+        result[i] = local_result;
     }
 }
 
