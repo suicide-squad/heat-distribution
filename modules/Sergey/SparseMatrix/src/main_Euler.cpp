@@ -3,35 +3,10 @@
 //
 
 #include <iostream>
-#include <omp.h>
+#include <cmath>
 #include "SparseMatrix.h"
 using std::string;
 
-vector<double> fillVect();
-void fillMatrix(double** &matrix, string filename, int &size) {
-    FILE *infile = fopen(filename.c_str(), "r");
-
-    if (infile == NULL) {
-        printf("File reading error. Try to relocate input file\n");
-        exit(0);
-    }
-
-    // Scan size of matrix.
-    fscanf(infile, "size=%d", &size);
-    if (size == 0 || size < 0) {
-        printf("Error, wrong size");
-        exit(0);
-    }
-
-    matrix = new double*[size];
-    for (int i = 0; i < size; ++i) {
-        matrix[i] = new double[size];
-        for (int j = 0; j < size; ++j) {
-            fscanf(infile, "%lf", &matrix[i][j]);
-        }
-    }
-    fclose(infile);
-}
 
 
 
@@ -92,7 +67,6 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
-    time_S = omp_get_wtime();
     //  Prev val calculating
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
@@ -107,12 +81,14 @@ int main(int argc, char** argv) {
     // Sparse Matrix fill
 
     SparseMatrix matrix;
-    matrix.fillMatrix2Expr(nX+2, expression, expression2);
+    spMatrixInit(matrix, nX * 3 + 2, nX + 2);
+    fillMatrix2Expr(matrix, nX+2, expression, expression2);
 
     // Calculating
+    time_S = omp_get_wtime();
 
     for (double j = 0; j < tFinal; j += dt) {
-        matrix.multiplicateVector(vect[prevTime], vect[currTime], nX+2);
+        multiplicateVector(matrix, vect[prevTime], vect[currTime], nX+2);
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
