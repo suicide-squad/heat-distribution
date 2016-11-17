@@ -67,15 +67,14 @@ int main(int argc, char** argv) {
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
 
+    double expr = (sigma * dt) / (step * step);
     for (double j = 0; j < tFinal; j += dt) {
 
         omp_set_num_threads(2);
-        //pragma omp parallel num_threads(4)
         {
             #pragma omp parallel for if (ENABLE_PARALLEL)
             for (int i = 1; i <= nX; i++) {
-                vect[currTime][i] = ((sigma * dt) / (step * step)) *
-                                    (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
+                vect[currTime][i] = expr * (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
                                     + vect[prevTime][i];
             }
         }
