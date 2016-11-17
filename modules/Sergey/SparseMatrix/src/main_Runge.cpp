@@ -4,38 +4,13 @@
 
 #include <iostream>
 #include <omp.h>
+#include <cmath>
 #include "SparseMatrix.h"
 using std::string;
 
-vector<double> fillVect();
-void fillMatrix(double** &matrix, string filename, int &size) {
-    FILE *infile = fopen(filename.c_str(), "r");
-
-    if (infile == NULL) {
-        printf("File reading error. Try to relocate input file\n");
-        exit(0);
-    }
-
-    // Scan size of matrix.
-    fscanf(infile, "size=%d", &size);
-    if (size == 0 || size < 0) {
-        printf("Error, wrong size");
-        exit(0);
-    }
-
-    matrix = new double*[size];
-    for (int i = 0; i < size; ++i) {
-        matrix[i] = new double[size];
-        for (int j = 0; j < size; ++j) {
-            fscanf(infile, "%lf", &matrix[i][j]);
-        }
-    }
-    fclose(infile);
-}
-
-
 
 int main(int argc, char** argv) {
+
 
     // Timing variables
     double time_S, time_E;  // Time for allocate memory
@@ -92,7 +67,6 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
-    time_S = omp_get_wtime();
     //  Prev val calculating
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
@@ -112,36 +86,44 @@ int main(int argc, char** argv) {
 
 
     SparseMatrix sm_k1;
+    spMatrixInit(sm_k1, nX * 3 + 2, nX + 2);
     double expression1 = sigma / (step * step);
     double expression2 = -2.0 * expression1;
-    sm_k1.fillMatrix2Expr(nX + 2, expression1, expression2);
+    fillMatrix2Expr(sm_k1, nX + 2, expression1, expression2);
 
+    // KURWA
     SparseMatrix sm_k2;
+    spMatrixInit(sm_k2, nX * 3 + 2, nX + 2);
     double k2expr1 = dt * expression1 * 0.5;
     double k2expr2 = 1 - 2.0 * k2expr1;
-    sm_k2.fillMatrix2Expr(nX+2, k2expr1, k2expr2);
+    fillMatrix2Expr(sm_k2, nX+2, k2expr1, k2expr2);
 
     SparseMatrix sm_k3;
+    spMatrixInit(sm_k3, nX * 3 + 2, nX + 2);
     double k3expr1 = k2expr1;
-    double k3expr2 = k2expr1;
-    sm_k3.fillMatrix2Expr(nX+2, k3expr2, k3expr2);
+    double k3expr2 = k2expr2;
+    fillMatrix2Expr(sm_k3, nX+2, k3expr1, k3expr2);
 
     SparseMatrix sm_k4;
+    spMatrixInit(sm_k4, nX * 3 + 2, nX + 2);
     double k4expr1 = dt * expression1;
     double k4expr2 = 1 - 2.0 * k4expr1;
-    sm_k4.fillMatrix2Expr(nX+2, k4expr2, k4expr2);
+    fillMatrix2Expr(sm_k4, nX+2, k4expr1, k4expr2);
 
 
     // Calculating
 
+    time_S = omp_get_wtime();
     double expressionResult = dt / 6;
     for (double j = 0; j < tFinal; j += dt) {
-        sm_k1.multiplicateVector(vect[prevTime], v_k1, nX+2);
-        sm_k2.multiplicateVector(v_k1, v_k2, nX+2);
-        sm_k3.multiplicateVector(v_k2, v_k3, nX+2);
-        sm_k4.multiplicateVector(v_k3, v_k4, nX+2);
+        multiplicateVector(sm_k1, vect[prevTime], v_k1, nX+2);
+        multiplicateVector(sm_k2, v_k1, v_k2, nX+2);
+        multiplicateVector(sm_k3, v_k2, v_k3, nX+2);
+        multiplicateVector(sm_k4, v_k3, v_k4, nX+2);
 
         // Fill result vector
+        omp_set_num_threads(4);
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
             vect[currTime][i] = vect[prevTime][i] +
                     expressionResult * (v_k1[i] + 2.0 * v_k2[i] + 2.0 * v_k3[i] + v_k4[i]);

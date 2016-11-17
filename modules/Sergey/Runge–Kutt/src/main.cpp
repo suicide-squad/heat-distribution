@@ -1,9 +1,16 @@
 #include <iostream>
 #include <cmath>
+#include <omp.h>
 
 using std::string;
 
+const int ENABLE_PARALLEL = 1;
+
 int main(int argc, char** argv) {
+
+    // Timing variables
+    double time_S, time_E;  // Time for allocate memory
+
     string filename = "../../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
@@ -46,6 +53,8 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
+    time_S = omp_get_wtime();
+
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
     prevTime = 0;
     currTime = 1;
@@ -64,9 +73,12 @@ int main(int argc, char** argv) {
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
     int timeStep = (int) ((tFinal - tStart) / dt);
+    double expr = dt / 2.0;
 
     for (double j = 0; j < timeStep; j += 1) {
+        omp_set_num_threads(4);
         // Fill k1 vect
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
             k1Vect[i] = (vect[prevTime][i + 1] - 2.0 * vect[prevTime][i] + vect[prevTime][i - 1]) * expression;
         }
@@ -75,26 +87,29 @@ int main(int argc, char** argv) {
         k1Vect[nX + 1] = k1Vect[nX];
 
         // Fill k2.0 vect
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
-            k2Vect[i] = expression * ((vect[prevTime][i + 1]) + (k1Vect[i + 1] * dt / 2.0)
+            k2Vect[i] = expression * ((vect[prevTime][i + 1]) + (k1Vect[i + 1] * expr)
                         - (2.0 * vect[prevTime][i] + k1Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k1Vect[i - 1] * dt / 2.0);
+                        + vect[prevTime][i - 1] + k1Vect[i - 1] * expr);
         }
         // bounders
         k2Vect[0] = k2Vect[1];
         k2Vect[nX + 1] = k2Vect[nX];
 
         // Fill k3 vect
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
-            k3Vect[i] = expression * ((vect[prevTime][i + 1]) + (k2Vect[i + 1] * dt / 2.0)
+            k3Vect[i] = expression * ((vect[prevTime][i + 1]) + (k2Vect[i + 1] * expr)
                         - (2.0 * vect[prevTime][i] + k2Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k2Vect[i - 1] * dt / 2.0);
+                        + vect[prevTime][i - 1] + k2Vect[i - 1] * expr);
         }
         // bounders
         k3Vect[0] = k3Vect[1];
         k3Vect[nX + 1] = k3Vect[nX];
 
         // Fill k4 vect
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
             k4Vect[i] = expression * ((vect[prevTime][i + 1]) + (k3Vect[i + 1] * dt)
                         - (2.0 * vect[prevTime][i] + k3Vect[i] * 2.0 * dt)
@@ -105,6 +120,7 @@ int main(int argc, char** argv) {
         k4Vect[nX + 1] = k4Vect[nX];
 
         // FIll result vector
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
             vect[currTime][i] = vect[prevTime][i] + ((dt / 6) * (k1Vect[i] + 2.0*k2Vect[i] + 2.0*k3Vect[i] + k4Vect[i]));
 
@@ -118,6 +134,9 @@ int main(int argc, char** argv) {
         prevTime = (prevTime + 1) % 2;
         currTime = (currTime + 1) % 2;
     }
+
+    time_E = omp_get_wtime();
+    printf("Run time %.15lf\n", time_E-time_S);
 
     FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
 
