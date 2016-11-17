@@ -4,7 +4,6 @@
 
 #include "SparseMatrix.h"
 
-const int ENABLE_PARALLEL = 1;
 
 void spMatrixInit(SparseMatrix &sp, int size, int rows) {
     sp._size = size;

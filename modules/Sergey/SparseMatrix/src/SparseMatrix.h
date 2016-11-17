@@ -7,6 +7,7 @@
 #include <omp.h>
 #include <cstdio>
 
+const int ENABLE_PARALLEL = 1;
 
 typedef struct SparseMatrix {
     int _size;
