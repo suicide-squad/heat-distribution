@@ -73,9 +73,10 @@ int main(int argc, char** argv) {
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
     int timeStep = (int) ((tFinal - tStart) / dt);
+    double expr = dt / 2.0;
 
     for (double j = 0; j < timeStep; j += 1) {
-        omp_set_num_threads(3);
+        omp_set_num_threads(4);
         // Fill k1 vect
         #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
@@ -88,9 +89,9 @@ int main(int argc, char** argv) {
         // Fill k2.0 vect
         #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
-            k2Vect[i] = expression * ((vect[prevTime][i + 1]) + (k1Vect[i + 1] * dt / 2.0)
+            k2Vect[i] = expression * ((vect[prevTime][i + 1]) + (k1Vect[i + 1] * expr)
                         - (2.0 * vect[prevTime][i] + k1Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k1Vect[i - 1] * dt / 2.0);
+                        + vect[prevTime][i - 1] + k1Vect[i - 1] * expr);
         }
         // bounders
         k2Vect[0] = k2Vect[1];
@@ -99,9 +100,9 @@ int main(int argc, char** argv) {
         // Fill k3 vect
         #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
-            k3Vect[i] = expression * ((vect[prevTime][i + 1]) + (k2Vect[i + 1] * dt / 2.0)
+            k3Vect[i] = expression * ((vect[prevTime][i + 1]) + (k2Vect[i + 1] * expr)
                         - (2.0 * vect[prevTime][i] + k2Vect[i] * dt)
-                        + vect[prevTime][i - 1] + k2Vect[i - 1] * dt / 2.0);
+                        + vect[prevTime][i - 1] + k2Vect[i - 1] * expr);
         }
         // bounders
         k3Vect[0] = k3Vect[1];

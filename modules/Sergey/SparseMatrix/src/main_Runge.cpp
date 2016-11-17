@@ -122,6 +122,8 @@ int main(int argc, char** argv) {
         multiplicateVector(sm_k4, v_k3, v_k4, nX+2);
 
         // Fill result vector
+        omp_set_num_threads(4);
+        #pragma omp parallel for if (ENABLE_PARALLEL)
         for (int i = 1; i <= nX; i++) {
             vect[currTime][i] = vect[prevTime][i] +
                     expressionResult * (v_k1[i] + 2.0 * v_k2[i] + 2.0 * v_k3[i] + v_k4[i]);
