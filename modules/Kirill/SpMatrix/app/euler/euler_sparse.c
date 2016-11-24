@@ -26,7 +26,8 @@ int main() {
   //                      Инициализация данных
   //------------------------------------------------------------------------
 
-  init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U);
+  if ( init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U) )
+    return -1;
 
   double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
@@ -38,6 +39,9 @@ int main() {
     return -1;
   }
 
+  #if ENABLE_PARALLEL
+    printf("ПАРАЛЛЕЛЬНАЯ ВЕРСИЯ!\n");
+  #endif
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
 
   //------------------------------------------------------------------------
@@ -66,19 +70,19 @@ int main() {
     UNext = tmp;
   }
   double t1 = omp_get_wtime();
-  printf("finish!\n\n");
+  printf("\nfinish!\n\n");
 
   //------------------------------------------------------------------------
   //                       Вывод результатов и чистка памяти
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-  unsigned long long flop = (2*3*nX + 2*2)*sizeTime;
+  double gflop = (2*3*nX + 2*2)*sizeTime*1.0/1000000000.0;
   printf("Time\t%.15lf\n", diffTime);
-  printf("Flop\t%.0llu\n", flop);
-  printf("GFlops\t%.15lf\n", flop*1.0/(diffTime*1000000000.0));
+  printf("GFlop\t%.lf\n", gflop);
+  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  final(U);
+  //final(U);
 
   free(U);
   free(UNext);
@@ -103,23 +107,32 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   FILE *fp;
   if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
-    return -1;
+    return -2;
   };
 
-  fscanf(fp, "XSTART=%lf\n", xStart);
-  fscanf(fp, "XEND=%lf\n", xEnd);
-  fscanf(fp, "SIGMA=%lf\n", sigma);
-  fscanf(fp, "NX=%lu\n", &nX);
-  fscanf(fp, "TSTART=%lf\n", tStart);
-  fscanf(fp, "TFINISH=%lf\n", tFinal);
-  fscanf(fp, "dt=%lf\n", dt);
-  fscanf(fp, "BC=%d\n", check);
+  if ( !fscanf(fp, "XSTART=%lf\n", xStart) )
+    return -1;
+  if ( !fscanf(fp, "XEND=%lf\n", xEnd) )
+    return -1;
+  if ( !fscanf(fp, "SIGMA=%lf\n", sigma) )
+    return -1;
+  if ( !fscanf(fp, "NX=%lu\n", &nX) )
+    return -1;
+  if ( !fscanf(fp, "TSTART=%lf\n", tStart) )
+    return -1;
+  if ( !fscanf(fp, "TFINISH=%lf\n", tFinal) )
+    return -1;
+  if ( !fscanf(fp, "dt=%lf\n", dt) )
+    return -1;
+  if ( !fscanf(fp, "BC=%d\n", check) )
+    return -1;
 
   *U = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
 
   // Заполнение функции в нулевой момент времени
   for (int i = 1; i < nX - 1; i++)
-    fscanf(fp, "%lf", &(*U)[i]);
+    if ( !fscanf(fp, "%lf", &(*U)[i]) )
+      return -1;
   (*U)[0] = (*U)[nX + 1] = 0.0;
   fclose(fp);
 
