@@ -9,7 +9,7 @@
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
-int final(TYPE *);
+void final(TYPE *);
 
 size_t nX;
 
@@ -42,8 +42,8 @@ int main() {
   //------------------------------------------------------------------------
 
   spMatrix A;
-  double coeff1 = dt*sigma/(step*step) + 1.0;
-  double coeff2 = 1.0 + step*step/(sigma*dt);
+  double coeff1 = dt*sigma/(step*step + 2.0*sigma*dt);
+  double coeff2 = step*step/(step*step + 2.0*sigma*dt);
   createSpMat(&A, coeff1, coeff2);
 
   // -----------------------------------------------------------------------
@@ -153,7 +153,7 @@ void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
   mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 1;
 }
 
-int final(TYPE *UFin) {
+void final(TYPE *UFin) {
   FILE *fp;
   fp = fopen("./../../../../result/kirillImplicitEulerSparse.txt", "w");
 
