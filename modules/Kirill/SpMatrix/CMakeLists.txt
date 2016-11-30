@@ -19,8 +19,9 @@ get_filename_component(DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
 set(MODULE      "${DIR_NAME}")
 set(LIBRARY     "lib_${MODULE}")
 set(TESTS       "test_${MODULE}")
-set(EULER "euler_${MODULE}")
-set(RUNGEKUTT "runge_${MODULE}")
+set(EULER       "euler_${MODULE}")
+set(RUNGEKUTT   "runge_${MODULE}")
+set(IMPLICIT    "implicit_euler_${MODULE}")
 
 include_directories("./include")
 
