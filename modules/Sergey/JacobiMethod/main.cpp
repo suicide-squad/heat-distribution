@@ -1,15 +1,25 @@
 //
-// Created by lenferd on 10.11.16.
+// Created by lenferd on 28.11.16.
 //
 
-#include <iostream>
-#include <omp.h>
-#include <cmath>
 #include "SparseMatrix.h"
+
+#include <iostream>
+#include <cmath>
+#include <omp.h>
+
 using std::string;
 
+double norm2Vect(double *&vect1, double *&vect2, int size) {
+    double result = 0;
+    for (int i = 0; i < size; i++) {
+        result += pow(vect1[i] - vect2[i], 2);
+    }
+    result = sqrt(result);
+    return result;
+}
 
-int main(int argc, char** argv) {
+int main() {
 
 
     // Timing variables
@@ -17,7 +27,7 @@ int main(int argc, char** argv) {
 
     // File open
 
-    string filename = "../../../../../initial/INPUT.txt";
+    string filename = "../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -41,6 +51,7 @@ int main(int argc, char** argv) {
 
     double step = 0.0;
 
+    double eps = 1e-7;
     //  File reading
 
     fscanf(infile, "XSTART=%lf\n", &xStart);    // start coordinate
@@ -75,65 +86,56 @@ int main(int argc, char** argv) {
 
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
-
-
     // Sparse Matrix fill
 
-    double* v_k1 = new double[nX + 2];
-    double* v_k2 = new double[nX + 2];
-    double* v_k3 = new double[nX + 2];
-    double* v_k4 = new double[nX + 2];
+    SparseMatrix spMatrix;
+    spMatrixInit(spMatrix, nX*3 + 2, nX + 2);
+//    double expr1 = -sigma * dt / (step * step);
+//    double expr2 = 1 + 2 * (sigma * dt / (step * step));
+    double dopexprUp = (sigma * dt) / (step * step);
+    double dopexprDw = 1 + 2 * dopexprUp;
+    double expr1 = dopexprUp / dopexprDw;
 
+    double expr3 = 1 / dopexprDw;
+//  double expr2 = 1 / (1 + 2 * (sigma * dt / (step * step)));
+    double expr2 = 0;
+    fillMatrix2Expr(spMatrix, nX + 2, expr1, expr2);
 
-    SparseMatrix sm_k1;
-    spMatrixInit(sm_k1, nX * 3 + 2, nX + 2);
-    double expression1 = sigma / (step * step);
-    double expression2 = -2.0 * expression1;
-    fillMatrix2Expr(sm_k1, nX + 2, expression1, expression2);
+    std::cout << expr1 << std::endl;
+    std::cout << expr2 << std::endl;
+    std::cout << expr3 << std::endl;
 
-    // KURWA
-    SparseMatrix sm_k2;
-    spMatrixInit(sm_k2, nX * 3 + 2, nX + 2);
-    double k2expr1 = dt * expression1 * 0.5;
-    double k2expr2 = 1 - 2.0 * k2expr1;
-    fillMatrix2Expr(sm_k2, nX+2, k2expr1, k2expr2);
-
-    SparseMatrix sm_k3;
-    spMatrixInit(sm_k3, nX * 3 + 2, nX + 2);
-    double k3expr1 = k2expr1;
-    double k3expr2 = k2expr2;
-    fillMatrix2Expr(sm_k3, nX+2, k3expr1, k3expr2);
-
-    SparseMatrix sm_k4;
-    spMatrixInit(sm_k4, nX * 3 + 2, nX + 2);
-    double k4expr1 = dt * expression1;
-    double k4expr2 = 1 - 2.0 * k4expr1;
-    fillMatrix2Expr(sm_k4, nX+2, k4expr1, k4expr2);
-
-
-    // Calculating
+    // x1 = ax0 + b
+    prevTime = 0;
+    currTime = 1;
 
     time_S = omp_get_wtime();
     double expressionResult = dt / 6;
+
+    int iCOUNT = 0;
+
+    // prevTime is b vect now
+    double* const_vect = new double[nX + 2];
     for (double j = 0; j < tFinal; j += dt) {
-        multiplicateVector(sm_k1, vect[prevTime], v_k1, nX+2);
-        multiplicateVector(sm_k2, v_k1, v_k2, nX+2);
-        multiplicateVector(sm_k3, v_k2, v_k3, nX+2);
-        multiplicateVector(sm_k4, v_k3, v_k4, nX+2);
-
-        // Fill result vector
-        omp_set_num_threads(4);
-        #pragma omp parallel for if (ENABLE_PARALLEL)
-        for (int i = 1; i <= nX; i++) {
-            vect[currTime][i] = vect[prevTime][i] +
-                    expressionResult * (v_k1[i] + 2.0 * v_k2[i] + 2.0 * v_k3[i] + v_k4[i]);
+        for (int i = 0; i < nX + 2; i++) {
+            const_vect[i] = vect[prevTime][i] * expr3 ;
+//            vect[prevTime][i] = 1;
+//            std::cout << const_vect[i] << std::endl;
         }
+        do {
+            multiplicateVector(spMatrix, vect[prevTime], vect[currTime], nX + 2);
+            for (int i = 0; i < nX + 2; i++) {
+                vect[currTime][i] += const_vect[i];
+            }
 
-        vect[currTime][0] = vect[currTime][1];
-        vect[currTime][nX+1] = vect[currTime][nX];
+            prevTime = (prevTime + 1) % 2;
+            currTime = (currTime + 1) % 2;
 
-        prevTime = (prevTime + 1) % 2;
-        currTime = (currTime + 1) % 2;
+            if (iCOUNT % 10 == 0)
+               std::cout << norm2Vect(vect[prevTime], vect[currTime], nX + 2) << "======"  << j << std::endl;
+            iCOUNT++;
+//            std::cout << "====" ><< j << std::endl;
+        } while (norm2Vect(vect[prevTime], vect[currTime], nX + 2) > eps);  // vect[prevTime] = k + 1 now
     }
     time_E = omp_get_wtime();
     printf("Run time %.15lf\n", time_E-time_S);
@@ -144,5 +146,6 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }
+
 }
 
