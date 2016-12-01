@@ -5,7 +5,7 @@
 #ifndef SPARSE_SPARSE_H
 #define SPARSE_SPARSE_H
 
-#define ENABLE_PARALLEL 1
+#define ENABLE_PARALLEL 0
 //#define _COMPLEX_
 
 #include <omp.h>
@@ -33,7 +33,7 @@ typedef struct {
   size_t nRows;     // Количество строк
 } spMatrix;
 
-void initSpMat(spMatrix *mat, size_t nz, size_t nRows);
+void initSpMat(spMatrix* mat, size_t nz, size_t nRows);
 void freeSpMat(spMatrix* mat);
 
 void multMV(TYPE** result, spMatrix matrix, TYPE* vector);

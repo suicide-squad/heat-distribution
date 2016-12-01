@@ -42,19 +42,24 @@ array2 = numpy.loadtxt(file)
 
 yAbs = [xi-xj for xi, xj in zip(array1, array2)]
 yRelat = [(xi-xj)/max(xi, xj) for xi, xj in zip(array1, array2)]
+yResult1 = array1[:]
+yResult2 = array2[:]
 
 absoluteFault = max(map(abs,yAbs))
 relativeFault = max(map(abs,yRelat))
 print("абсолютная:\t%.15f" % absoluteFault)
 print("относительная:\t%.15f" % relativeFault)
 
+#####################################################################
+#                    Рисование графиков                             #
+#####################################################################
+
 try:
     assert len(x) == len(yAbs)
-    # Рисование графиков
 
     plt.figure(num = 'FAULT', facecolor = (1, 1, .54))
 
-    plt.subplot(121)
+    plt.subplot(221)
     plt.plot(x, yAbs, label ='absolut', color = 'green')
 
     plt.legend(loc = 2)
@@ -65,11 +70,22 @@ try:
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x,y: '{:.0e}'.format(x)))
     # plt.yscale('log')
 
-
-    plt.subplot(122)
+    plt.subplot(222)
     plt.plot(x, yRelat, label = 'relative', color = 'red')
     plt.legend(loc = 2)
     plt.xlabel('x', fontsize=14)
+    plt.grid(True)
+
+    plt.subplot(223)
+    plt.plot(x, yResult1, label = 'result 1', color = 'blue')
+    plt.legend(loc = 2)
+    plt.xlabel('x', fontsize = 14)
+    plt.grid(True)
+
+    plt.subplot(224)
+    plt.plot(x, yResult2, label = 'result 2', color = 'brown')
+    plt.legend(loc = 2)
+    plt.xlabel('x', fontsize = 14)
     plt.grid(True)
 
     plt.show()

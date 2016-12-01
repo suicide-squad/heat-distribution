@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(SpMatrix)
 
+if (UNIX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
+endif(UNIX)
 
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
@@ -23,5 +25,5 @@ set(RUNGEKUTT "runge_${MODULE}")
 include_directories("./include")
 
 add_subdirectory(src)
-add_subdirectory(test)
+# add_subdirectory(test)
 add_subdirectory(app)

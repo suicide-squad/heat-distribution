@@ -27,7 +27,7 @@ int main() {
   //                      ИНИЦИАЛИЗАЦИЯ И ЧТЕНИЕ ДАННЫХ
   //------------------------------------------------------------------------
 
-  if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
+  if ((fp = fopen("./../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     exit(-1);
   }
@@ -43,6 +43,11 @@ int main() {
   fscanf(fp, "BC=%hhu\n", &check);
 
   sizeTime = (size_t) ((tFinal - tStart) / dt);
+
+
+  #if ENABLE_PARALLEL
+    printf("ПАРАЛЛЕЛЬНАЯ ВЕРСИЯ!\n");
+  #endif
 
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
 
@@ -70,7 +75,7 @@ int main() {
   // Задание граничных условий
   if (check == 2) {
     U[0][0] = U[0][1];
-    U[0][nX - 1] = U[0][nX - 2];
+    U[0][nX + 1] = U[0][nX];
   } else if (check == 1) {
     // ???
     printf("HZ");
@@ -91,7 +96,7 @@ int main() {
     prevTime = (i + 1) % N;
 
 
-    #pragma parallel omp num_threads(2) if (ENABLE_PARALLEL)
+    #pragma omp parallel num_threads(2) if (ENABLE_PARALLEL)
     {
       #pragma omp for nowait
       for (j = 1; j < nX + 2; j++)
@@ -101,33 +106,31 @@ int main() {
     // Задание граничных условий
     if (check == 2) {
       U[curTime][0] = U[curTime][1];
-      U[curTime][nX - 1] = U[curTime][nX - 2];
+      U[curTime][nX + 1] = U[curTime][nX];
     } else if (check == 1) {
       printf("HZ");
     }
   } // for
   double t1 = omp_get_wtime();
-  printf("finish!\n\n");
+  printf("\nfinish!\n\n");
 
   //------------------------------------------------------------------------
   //                      ВЫВОД РЕЗУЛЬТАТОВ И ЧИСТКА МУСОРА
   //------------------------------------------------------------------------
 
   double diffTime = t1-t0;
-  unsigned long long flop = 5*nX*sizeTime;
+  double gflop = 5*nX*sizeTime*1.0/1000000000.0;
   printf("Time\t%.15lf\n", diffTime);
-  printf("Flop\t%.0llu\n", flop);
-  printf("GFlops\t%.15lf\n", 1.0*flop/(diffTime*1000000000.0));
+  printf("GFlop\t%.lf\n", gflop);
+  printf("GFlop's\t%.15lf\n", 1.0*gflop/(diffTime));
 
-
-
-  fp = fopen("./../../../../result/kirillEuler.txt", "w");
-
-  // Вывод результатов
-  for (int i = 1; i < nX + 1; i++)
-    fprintf(fp, "%.15le\n", U[sizeTime%2][i]);
-
-  fclose(fp);
+//  fp = fopen("./../../../../result/kirillEuler.txt", "w");
+//
+//  // Вывод результатов
+//  for (int i = 1; i < nX + 1; i++)
+//    fprintf(fp, "%.15le\n", U[sizeTime%2][i]);
+//
+//  fclose(fp);
 
   // Чистка мусора
   for (int i = 0; i < 2; i++) {

@@ -2,6 +2,7 @@
 __pycache__/
 
 # C
+build/
 Debug/
 Release/
 .idea/

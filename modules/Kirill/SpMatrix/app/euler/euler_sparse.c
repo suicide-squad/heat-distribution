@@ -8,8 +8,8 @@
 #include <sp_mat.h>
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
-void createSpMat(spMatrix*, double, double);
-int final(TYPE **);
+void createSpMat(spMatrix *, TYPE, TYPE);
+int final(TYPE *);
 
 size_t nX;
 
@@ -26,7 +26,8 @@ int main() {
   //                      Инициализация данных
   //------------------------------------------------------------------------
 
-  init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U);
+  if ( init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U) )
+    return -1;
 
   double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
@@ -38,6 +39,9 @@ int main() {
     return -1;
   }
 
+  #if ENABLE_PARALLEL
+    printf("ПАРАЛЛЕЛЬНАЯ ВЕРСИЯ!\n");
+  #endif
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
 
   //------------------------------------------------------------------------
@@ -66,24 +70,24 @@ int main() {
     UNext = tmp;
   }
   double t1 = omp_get_wtime();
-  printf("finish!\n\n");
+  printf("\nfinish!\n\n");
 
   //------------------------------------------------------------------------
   //                       Вывод результатов и чистка памяти
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-  unsigned long long flop = (2*3*nX + 2*2)*sizeTime;
+  double gflop = (2*3*nX + 2*2)*sizeTime*1.0/1000000000.0;
   printf("Time\t%.15lf\n", diffTime);
-  printf("Flop\t%.0llu\n", flop);
-  printf("GFlops\t%.15lf\n", flop*1.0/(diffTime*1000000000.0));
+  printf("GFlop\t%.lf\n", gflop);
+  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  final(&U);
+  //final(U);
 
-//  free(U);
+  free(U);
   free(UNext);
 
-//  freeSpMat(&A);
+  freeSpMat(&A);
   return 0;
 
 }
@@ -103,39 +107,48 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   FILE *fp;
   if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
-    return -1;
+    return -2;
   };
 
-  fscanf(fp, "XSTART=%lf\n", xStart);
-  fscanf(fp, "XEND=%lf\n", xEnd);
-  fscanf(fp, "SIGMA=%lf\n", sigma);
-  fscanf(fp, "NX=%lu\n", &nX);
-  fscanf(fp, "TSTART=%lf\n", tStart);
-  fscanf(fp, "TFINISH=%lf\n", tFinal);
-  fscanf(fp, "dt=%lf\n", dt);
-  fscanf(fp, "BC=%d\n", check);
+  if ( !fscanf(fp, "XSTART=%lf\n", xStart) )
+    return -1;
+  if ( !fscanf(fp, "XEND=%lf\n", xEnd) )
+    return -1;
+  if ( !fscanf(fp, "SIGMA=%lf\n", sigma) )
+    return -1;
+  if ( !fscanf(fp, "NX=%lu\n", &nX) )
+    return -1;
+  if ( !fscanf(fp, "TSTART=%lf\n", tStart) )
+    return -1;
+  if ( !fscanf(fp, "TFINISH=%lf\n", tFinal) )
+    return -1;
+  if ( !fscanf(fp, "dt=%lf\n", dt) )
+    return -1;
+  if ( !fscanf(fp, "BC=%d\n", check) )
+    return -1;
 
   *U = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
 
   // Заполнение функции в нулевой момент времени
   for (int i = 1; i < nX - 1; i++)
-    fscanf(fp, "%lf", &(*U)[i]);
+    if ( !fscanf(fp, "%lf", &(*U)[i]) )
+      return -1;
   (*U)[0] = (*U)[nX + 1] = 0.0;
   fclose(fp);
 
   return 0;
 }
 
-void createSpMat(spMatrix *mat, double coeff1, double coeff2) {
+void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
 
-  initSpMat(mat, nX*3, nX + 3);
+  initSpMat(mat, nX*3 + 2, nX + 3);
 
   int j = 0;
     mat->value[0] = 1.0;          mat->col[0] = 0;
   for (int i = 1; i < 3*nX + 1; i += 3) {
-    mat->value[i] = coeff1;       mat->col[i] = j++;
+    mat->value[i] = coeff;       mat->col[i] = j++;
     mat->value[i + 1] = coeff2;   mat->col[i + 1] = j++;
-    mat->value[i + 2] = coeff1;   mat->col[i + 2] = j--;
+    mat->value[i + 2] = coeff;   mat->col[i + 2] = j--;
   }
     mat->value[nX*3 + 1] = 1.0;   mat->col[3*nX + 1]  = (int)nX + 1;
 
@@ -147,12 +160,12 @@ void createSpMat(spMatrix *mat, double coeff1, double coeff2) {
   mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 1;
 }
 
-int final(TYPE **UFin) {
+int final(TYPE *UFin) {
   FILE *fp;
   fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
 
   for (int i = 1; i < nX + 1; i++)
-    fprintf(fp, "%.15le\n", (*UFin)[i]);
+    fprintf(fp, "%.15le\n", UFin[i]);
 
   fclose(fp);
 }

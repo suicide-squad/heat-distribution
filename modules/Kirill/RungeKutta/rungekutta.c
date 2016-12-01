@@ -26,7 +26,7 @@ int main() {
   //                Инициализация из файла
   //------------------------------------------------------------------------
 
-  if((fp=fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
+  if((fp=fopen("./../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     exit(-1);
   }
@@ -43,6 +43,9 @@ int main() {
 
   sizeTime = (size_t)((tFinal - tStart)/dt);
 
+  #if ENABLE_PARALLEL
+    printf("ПАРАЛЛЕЛЬНАЯ ВЕРСИЯ!\n");
+  #endif
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
 
   U = (double *)malloc((nX + 2)*sizeof(double));
@@ -66,7 +69,7 @@ int main() {
   // Задание граничных условий
   if (check == 2) {
     U[0] = U[1];
-    U[nX - 1] = U[nX -2];
+    U[nX + 1] = U[nX];
   } else if (check == 1) {
     // ???
     printf("HZ");
@@ -90,33 +93,45 @@ int main() {
   for (int t = 1; t <= sizeTime; t++) {
     // Вычисление ki в данный момент времени
 
-    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
+    #pragma omp parallel for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k1[x] = (U[x + 1] - 2.0*U[x] + U[x - 1])*coeff;
 
-    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
+    k1[0] = k1[1];
+    k1[nX + 1] = k1[nX];
+
+    #pragma omp parallel for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k2[x] = (U[x + 1] + k1[x + 1]*dt*0.5 - 2.0*U[x] -
           k1[x]*dt + U[x - 1] + k1[x - 1]*dt*0.5)*coeff;
 
-    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
+    k2[0] = k2[1];
+    k2[nX + 1] = k2[nX];
+
+    #pragma omp parallel for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k3[x] = (U[x + 1] + k2[x + 1]*dt*0.5 - 2.0*U[x] -
           k2[x]*dt + U[x - 1] + k2[x - 1]*dt*0.5)*coeff;
 
-    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
+    k3[0] = k3[1];
+    k3[nX + 1] = k3[nX];
+
+    #pragma omp parallel for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       k4[x] = (U[x + 1] + k3[x + 1]*dt - 2.0*U[x] -
           k3[x]*dt*2.0 + U[x - 1] + k3[x - 1]*dt)*coeff;
 
-    #pragma parallel omp for num_threads(2) if (ENABLE_PARALLEL)
+    k4[0] = k4[1];
+    k4[nX + 1] = k4[nX];
+
+    #pragma omp parallel for num_threads(2) if (ENABLE_PARALLEL)
     for (int x = 1; x < nX + 2; x++)
       Unext[x] = U[x] + (k1[x] + 2.0*k2[x] + 2.0*k3[x] + k4[x])*h;
 
     // Задание граничных условий
     if (check == 2) {
       Unext[0] = Unext[1];
-      Unext[nX - 1] = Unext[nX -2];
+      Unext[nX + 1] = Unext[nX];
     } else if (check == 1) {
       // ???
       printf("HZ");
@@ -128,22 +143,22 @@ int main() {
   }
 
   double t1 = omp_get_wtime();
-  printf("finish!\n\n");
+  printf("\nfinish!\n\n");
 
   //------------------------------------------------------------------------
   //                       Вывод результатов и чистка памяти
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-  unsigned long long flop = (nX*4 + nX*12 + nX*12 + nX*11 + nX*7)*sizeTime;
+  double gflop = (nX*4 + nX*12 + nX*12 + nX*11 + nX*7)*sizeTime*1.0/1000000000.0;
   printf("Time\t%.15lf\n", diffTime);
-  printf("Flop\t%.0llu\n", flop);
-  printf("GFlops\t%.15lf\n", flop*1.0/(diffTime*1000000000.0));
+  printf("GFlop\t%.lf\n", gflop);
+  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  fp = fopen("./../../../../result/kirillRungeKutta.txt", "w");
-  for (int x = 1; x < nX + 1; x++)
-    fprintf(fp, "%.15le\n", U[x]);
-  fclose(fp);
+//  fp = fopen("./../../../../result/kirillRungeKutta.txt", "w");
+//  for (int x = 1; x < nX + 1; x++)
+//    fprintf(fp, "%.15le\n", U[x]);
+//  fclose(fp);
   free(U);
   free(Unext);
 

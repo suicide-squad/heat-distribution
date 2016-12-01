@@ -1,7 +1,7 @@
 //
-
-// Created by kirill on 10.11.16.
+// Created by kirill on 14.11.16.
 //
+
 #include <stdio.h>
 #include <math.h>
 
@@ -18,8 +18,6 @@ int final(TYPE *);
 
 size_t nX;
 
-size_t num = 0;
-
 int main() {
   double xStart, xEnd;
   double sigma;
@@ -35,7 +33,7 @@ int main() {
 
   init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U);
 
-  double step = fabs(xStart - xEnd) / nX;
+  // double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
 
   printf("TIMESIZE = %lu; NX = %lu\n", sizeTime, nX);
@@ -44,34 +42,74 @@ int main() {
   //              Заполнение значений и номера столбцов матрицы
   //------------------------------------------------------------------------
 
-  spMatrix A;
-  complex coeff = CMPLX(1.0, dt);
+  spMatrix A1;
+  complex k1exp = CMPLX(0., 1.);
 
-  createSpMat(&A, coeff);
+  createSpMat(&A1, k1exp);
+
+  spMatrix A2;
+
+  complex k2exp = CMPLX(1., dt*0.5);
+
+  createSpMat(&A2, k2exp);
+
+  spMatrix A3;
+
+  complex k3exp = CMPLX(0., dt*0.5) + 1./k2exp;
+//complex k3exp = k2exp;
+
+  createSpMat(&A3, k3exp);
+
+  spMatrix A4;
+
+  complex k4exp = CMPLX(0., dt) + 1./(k2exp*k3exp);
+//complex k4exp = CMPLX(1., dt);
+
+  createSpMat(&A4, k4exp);
+
+  FILE* fpRe = fopen("./../../../../result/complex/Re.txt", "w");
+  FILE* fpIm = fopen("./../../../../result/complex/Im.txt", "w");
 
   // -----------------------------------------------------------------------
   //                              Вычисления
   //------------------------------------------------------------------------
 
   TYPE* UNext = (TYPE*)malloc(sizeof(TYPE) * nX);
+
+  TYPE* k1 = (TYPE*)malloc(sizeof(TYPE) * nX);
+  TYPE* k2 = (TYPE*)malloc(sizeof(TYPE) * nX);
+  TYPE* k3 = (TYPE*)malloc(sizeof(TYPE) * nX);
+  TYPE* k4 = (TYPE*)malloc(sizeof(TYPE) * nX);
+
   TYPE* tmp;
 
-  FILE* fpRe = fopen("./../../../../result/complex/Re.txt", "w");
-  FILE* fpIm = fopen("./../../../../result/complex/Im.txt", "w");
+  double h = dt/6.0;
 
   printInFile(U, fpRe, fpIm);
 
   double t0 = omp_get_wtime();
   for (int i = 1; i <= sizeTime; i++) {
-    // UNext = A*U
-    multMV(&UNext, A, U);
+    // k1 = A1*U
+    multMV(&k1, A1, U);
+
+    // k2 = A2*k1
+    multMV(&k2, A2, k1);
+
+    // k3 = A3*k2
+    multMV(&k3, A3, k2);
+
+    // k4 = A4*k3
+    multMV(&k4, A4, k3);
+
+    // UNext = U + (k1 + k2*2 + k3*2 + k4)*h;
+    sumV(nX + 2, h, &UNext, U, k1, k2, k3, k4);
 
     tmp = U;
     U = UNext;
     UNext = tmp;
+
     if ( i%10000 == 0 )
       printInFile(U, fpRe, fpIm);
-
   }
   double t1 = omp_get_wtime();
 
@@ -87,14 +125,15 @@ int main() {
   double diffTime = t1 - t0;
   printf("Time\t%.15lf\n", diffTime);
 
-  printf("size\t%lu\n", num);
-
   final(U);
 
   free(U);
   free(UNext);
 
-  freeSpMat(&A);
+  freeSpMat(&A1);
+  freeSpMat(&A2);
+  freeSpMat(&A3);
+  freeSpMat(&A4);
   return 0;
 
 }
@@ -138,7 +177,6 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart,
 
   return 0;
 }
-
 void createSpMat(spMatrix *mat, TYPE coeff) {
 
   initSpMat(mat, nX, nX);
@@ -157,7 +195,6 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
 }
 
 void printInFile(TYPE *UFin, FILE* fpRe, FILE* fpIm) {
-  num++;
   for (int i = 0; i < nX; i++) {
     fprintf(fpRe, "%lf ", creal(UFin[i]));
     fprintf(fpIm, "%lf ", cimag(UFin[i]));
@@ -166,10 +203,9 @@ void printInFile(TYPE *UFin, FILE* fpRe, FILE* fpIm) {
   fprintf(fpIm, "\n ");
 }
 
-
 int final(TYPE *UFin) {
   FILE *fp;
-  fp = fopen("./../../../../result/complex/EulerSparse.txt", "w");
+  fp = fopen("./../../../../result/complex/RungeSparse.txt", "w");
 
   for (int i = 0; i < nX; i++)
     fprintf(fp, "%.15le\t%+.15lei\n", creal(UFin[i]), cimag(UFin[i]));
