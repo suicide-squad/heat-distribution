@@ -6,9 +6,14 @@
 #include <math.h>
 #include <stdlib.h>
 #include <sp_mat.h>
+#include <stdbool.h>
+
+const double EPS = 1e-7;
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
+bool dist(double *, double *, size_t N);
+
 void final(TYPE *);
 
 size_t nX;
@@ -55,12 +60,14 @@ int main() {
 
   double t0 = omp_get_wtime();
   for (int i = 1; i <= sizeTime; i++) {
-    // UNext = A*U
-    multMV(&UNext, A, U);
+    do {
+      // UNext = A*U
+      multMV(&UNext, A, U);
 
-    tmp = U;
-    U = UNext;
-    UNext = tmp;
+      tmp = U;
+      U = UNext;
+      UNext = tmp;
+    } while (dist(U, UNext, nX + 2));
   }
   double t1 = omp_get_wtime();
   printf("\nfinish!\n\n");
@@ -70,10 +77,10 @@ int main() {
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-  double gflop = (2*3*nX + 2*2)*sizeTime*1.0/1000000000.0;
+//  double gflop = (2*3*nX + 2*2)*sizeTime*1.0/1000000000.0;
   printf("Time\t%.15lf\n", diffTime);
-  printf("GFlop\t%.lf\n", gflop);
-  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
+//  printf("GFlop\t%.lf\n", gflop);
+//  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
   final(U);
 
@@ -162,3 +169,11 @@ void final(TYPE *UFin) {
 
   fclose(fp);
 }
+
+bool dist(double *U1, double *U2, size_t N) {
+  for (int i = 0; i < N; i++)
+    if (fabs(U1[i] - U2[i]) > EPS)
+      return true;
+  return false;
+}
+
