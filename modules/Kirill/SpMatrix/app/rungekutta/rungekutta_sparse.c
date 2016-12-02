@@ -10,7 +10,7 @@
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
-int final(TYPE *);
+void final(TYPE *);
 
 size_t nX;
 
@@ -195,7 +195,7 @@ void createSpMat(spMatrix *mat, TYPE coeff1, TYPE coeff2) {
   mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1];
 }
 
-int final(TYPE *UFin) {
+void final(TYPE *UFin) {
   FILE *fp;
   fp = fopen("./../../../../result/kirillRungeKuttaSparse.txt", "w");
 

@@ -31,13 +31,6 @@ int main() {
 
   double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
-  if (2 * sigma * dt > step * step) {
-    printf("Выбор шага по времени не возможен в силу условия устойчивости!\n");
-    printf("%.10lf > %.10lf\n", 2 * sigma * dt, step * step);
-    printf("Предлагаю взять dt = %.10lf\n", step * step / (2.0 * sigma));
-
-    return -1;
-  }
 
   #if ENABLE_PARALLEL
     printf("ПАРАЛЛЕЛЬНАЯ ВЕРСИЯ!\n");
@@ -49,8 +42,8 @@ int main() {
   //------------------------------------------------------------------------
 
   spMatrix A;
-  double coeff1 = dt/(step*step);
-  double coeff2 = 1 - 2.0*coeff1;
+  double coeff1 = dt*sigma/(step*step + 2.0*sigma*dt);
+  double coeff2 = step*step/(step*step + 2.0*sigma*dt);
   createSpMat(&A, coeff1, coeff2);
 
   // -----------------------------------------------------------------------
@@ -82,7 +75,7 @@ int main() {
   printf("GFlop\t%.lf\n", gflop);
   printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  //final(U);
+  final(U);
 
   free(U);
   free(UNext);
@@ -162,7 +155,7 @@ void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
 
 void final(TYPE *UFin) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
+  fp = fopen("./../../../../result/kirillImplicitEulerSparse.txt", "w");
 
   for (int i = 1; i < nX + 1; i++)
     fprintf(fp, "%.15le\n", UFin[i]);

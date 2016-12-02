@@ -1,2 +1,3 @@
 add_subdirectory(euler)
 add_subdirectory(rungekutta)
+add_subdirectory(implicitEuler)
