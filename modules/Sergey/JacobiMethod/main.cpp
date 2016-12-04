@@ -11,12 +11,13 @@
 using std::string;
 
 double norm2Vect(double *&vect1, double *&vect2, int size) {
-    double result = 0;
-    for (int i = 0; i < size; i++) {
-        result += pow(vect1[i] - vect2[i], 2);
+    double norm = 0;
+    norm = fabs(vect1[0] - vect2[0]);
+    for (int h = 0; h < size; h++) {
+        if (fabs(vect1[h] - vect2[h]) > norm)
+            norm = fabs(vect1[h] - vect2[h]);
     }
-    result = sqrt(result);
-    return result;
+    return norm;
 }
 
 int main() {
@@ -110,18 +111,24 @@ int main() {
     currTime = 1;
 
     time_S = omp_get_wtime();
-    double expressionResult = dt / 6;
 
     int iCOUNT = 0;
 
     // prevTime is b vect now
     double* const_vect = new double[nX + 2];
+
+    double* vis_vect = new double[nX + 2];
+
+
     for (double j = 0; j < tFinal; j += dt) {
         for (int i = 0; i < nX + 2; i++) {
+//            vis_vect[i] = vect[prevTime][i];
             const_vect[i] = vect[prevTime][i] * expr3 ;
 //            vect[prevTime][i] = 1;
 //            std::cout << const_vect[i] << std::endl;
         }
+
+        int iterationCounter = 0;
         do {
             multiplicateVector(spMatrix, vect[prevTime], vect[currTime], nX + 2);
             for (int i = 0; i < nX + 2; i++) {
@@ -131,11 +138,15 @@ int main() {
             prevTime = (prevTime + 1) % 2;
             currTime = (currTime + 1) % 2;
 
-            if (iCOUNT % 10 == 0)
-               std::cout << norm2Vect(vect[prevTime], vect[currTime], nX + 2) << "======"  << j << std::endl;
-            iCOUNT++;
+//            if (iCOUNT % 1 == 0)
+//               std::cout << norm2Vect(vis_vect, vect[currTime], nX + 2) << "======"  << j << std::endl;
+//            iCOUNT++;
 //            std::cout << "====" ><< j << std::endl;
+            iterationCounter++;
         } while (norm2Vect(vect[prevTime], vect[currTime], nX + 2) > eps);  // vect[prevTime] = k + 1 now
+        if (iCOUNT % 100 == 0)
+            printf("time %lf, iterations %d\n", j, iterationCounter);
+        iCOUNT++;
     }
     time_E = omp_get_wtime();
     printf("Run time %.15lf\n", time_E-time_S);
