@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sp_mat.h>
 
 #include "sp_mat.h"
 
@@ -38,24 +39,25 @@ void sumV(size_t N, double h, TYPE **result, TYPE *U, TYPE *k1, TYPE *k2, TYPE *
 }
 
 
-//void SpareMatrix::print() {
-//  for (int i = 0; i < nRows_; i++) {
-//    for (int j = 0; j < nRows_; j++)
-//      printf("%3.7lf\t", this->operator()(i, j));
-//    printf("\n");
-//  }
-//}
-//TYPE SpareMatrix::operator()(int i, int j) {
-//  TYPE result = 0;
-//  int N1 = rowIndex_[i];
-//  int N2 = rowIndex_[i+1];
-//  for(int k = N1; k < N2; k++)
-//  {
-//    if (col_[k] == j)
-//    {
-//      result = value_[k];
-//      break;
-//    }
-//  }
-//  return result;
-//}
+void printSpMat(spMatrix mat) {
+  for (int i = 0; i < mat.nRows; i++) {
+    for (int j = 0; j < mat.nRows; j++)
+      printf("%3.7lf\t", procedure(mat, i, j));
+    printf("\n");
+  }
+}
+
+TYPE procedure(spMatrix mat, int i, int j) {
+  TYPE result = 0;
+  int N1 = mat.rowIndex[i];
+  int N2 = mat.rowIndex[i+1];
+  for(int k = N1; k < N2; k++)
+  {
+    if (mat.col[k] == j)
+    {
+      result = mat.value[k];
+      break;
+    }
+  }
+  return result;
+}
