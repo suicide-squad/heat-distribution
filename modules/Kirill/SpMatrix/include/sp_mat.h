@@ -5,7 +5,7 @@
 #ifndef SPARSE_SPARSE_H
 #define SPARSE_SPARSE_H
 
-#define ENABLE_PARALLEL 0
+#define ENABLE_PARALLEL 1
 //#define _COMPLEX_
 
 #include <omp.h>
@@ -41,6 +41,8 @@ void multMV(TYPE** result, spMatrix matrix, TYPE* vector);
 
 void sumV(size_t N, double h, TYPE **result, TYPE *U, TYPE *k1, TYPE *k2, TYPE *k3, TYPE *k4);
 
+void printSpMat(spMatrix mat);
+TYPE procedure(spMatrix mat, int i, int j);
 
 #ifdef __cplusplus
 }

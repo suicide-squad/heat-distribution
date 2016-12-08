@@ -2,13 +2,21 @@
 // Created by kirill on 24.10.16.
 //
 
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
 #include <sp_mat.h>
 
+const double EPS = 1e-10;
+
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
-void createSpMat(spMatrix *, TYPE, TYPE);
+void createSpMat(spMatrix *, TYPE);
+bool dist(double *, double *, size_t N);
+
 void final(TYPE *);
 
 size_t nX;
@@ -42,26 +50,50 @@ int main() {
   //------------------------------------------------------------------------
 
   spMatrix A;
-  double coeff1 = dt*sigma/(step*step + 2.0*sigma*dt);
-  double coeff2 = step*step/(step*step + 2.0*sigma*dt);
-  createSpMat(&A, coeff1, coeff2);
+
+  double coeff = sigma*dt/(step*step);
+  createSpMat(&A, coeff);
 
   // -----------------------------------------------------------------------
   //                              Вычисления
   //------------------------------------------------------------------------
 
-  TYPE* UNext = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
+  TYPE* X1 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
+  TYPE* X2 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
+
   TYPE* tmp;
 
-  double t0 = omp_get_wtime();
-  for (int i = 1; i <= sizeTime; i++) {
-    // UNext = A*U
-    multMV(&UNext, A, U);
+  double k = (step*step)/(step*step + 2*sigma*dt);
 
-    tmp = U;
-    U = UNext;
-    UNext = tmp;
+  int count = 0;
+  double t0 = omp_get_wtime();
+
+  for (int i = 1; i <= sizeTime; i++) {
+    memcpy(X1, U, (nX + 2)*sizeof(double));
+
+    do {
+      multMV(&X2, A, X1);
+
+      for (int i = 1; i < nX + 1; i++) {
+        X2[i] = (U[i] + X2[i])*k;
+      }
+
+      X2[0] = X2[1];
+      X2[nX + 1] = X2[nX];
+
+      tmp = X1;
+      X1 = X2;
+      X2 = tmp;
+
+      count++;
+
+    } while (!dist(X1, X2, nX + 2));
+
+    memcpy(U, X1, (nX + 2)*sizeof(double));
+
   }
+
+
   double t1 = omp_get_wtime();
   printf("\nfinish!\n\n");
 
@@ -70,15 +102,19 @@ int main() {
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-  double gflop = (2*3*nX + 2*2)*sizeTime*1.0/1000000000.0;
-  printf("Time\t%.15lf\n", diffTime);
-  printf("GFlop\t%.lf\n", gflop);
-  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
+  double gflop = (2*2*nX)*count*sizeTime*1.0/1000000000.0;
+
+  printf("EPS\t%.le\n", EPS);
+  printf("COUNT\t%d\n", count);
+  printf("TIME\t%.15lf\n", diffTime);
+//  printf("GFlop\t%.lf\n", gflop);
+//  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
   final(U);
 
   free(U);
-  free(UNext);
+  free(X1);
+  free(X2);
 
   freeSpMat(&A);
   return 0;
@@ -132,25 +168,25 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   return 0;
 }
 
-void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
+void createSpMat(spMatrix *mat, TYPE coeff) {
 
-  initSpMat(mat, nX*3 + 2, nX + 3);
+  size_t nz = nX*2;
+  size_t size = nX + 2;
+  initSpMat(mat, nz, size);
 
   int j = 0;
-    mat->value[0] = 1.0;          mat->col[0] = 0;
-  for (int i = 1; i < 3*nX + 1; i += 3) {
-    mat->value[i] = coeff;       mat->col[i] = j++;
-    mat->value[i + 1] = coeff2;   mat->col[i + 1] = j++;
-    mat->value[i + 2] = coeff;   mat->col[i + 2] = j--;
+  for (int i = 0; i < nz; i += 2) {
+    mat->value[i] = coeff;       mat->col[i] = j;
+    mat->value[i + 1] = coeff;   mat->col[i + 1] = j + 2;
+    j++;
   }
-    mat->value[nX*3 + 1] = 1.0;   mat->col[3*nX + 1]  = (int)nX + 1;
 
   mat->rowIndex[0] = 0;
-  mat->rowIndex[1] = 1;
-  for (int i = 2; i < nX + 2; i++) {
-    mat->rowIndex[i] = mat->rowIndex[i - 1] + 3;
+  mat->rowIndex[1] = 0;
+  for (int i = 2; i < size; i++) {
+    mat->rowIndex[i] = mat->rowIndex[i - 1] + 2;
   }
-  mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 1;
+  mat->rowIndex[size] = mat->rowIndex[size - 1];
 }
 
 void final(TYPE *UFin) {
@@ -162,3 +198,11 @@ void final(TYPE *UFin) {
 
   fclose(fp);
 }
+
+bool dist(double *x1, double *x2, size_t N) {
+  for (int i = 0; i < N; i++)
+    if (fabs(x1[i] - x2[i]) > EPS)
+      return false;
+  return true;
+}
+
