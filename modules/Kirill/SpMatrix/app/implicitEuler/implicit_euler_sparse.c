@@ -32,7 +32,7 @@ int main() {
 
   //------------------------------------------------------------------------
   //                      Инициализация данных
-  //-------------------скопировать массив c++-----------------------------------------------------
+  //------------------------------------------------------------------------
 
   if ( init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U) )
     return -1;
@@ -54,15 +54,10 @@ int main() {
   double coeff = sigma*dt/(step*step);
   createSpMat(&A, coeff);
 
-
-
-  //printSpMat(A);
-
   // -----------------------------------------------------------------------
   //                              Вычисления
   //------------------------------------------------------------------------
 
-  TYPE* UNext = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
   TYPE* X1 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
   TYPE* X2 = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
 
@@ -72,6 +67,7 @@ int main() {
 
   int count = 0;
   double t0 = omp_get_wtime();
+
   for (int i = 1; i <= sizeTime; i++) {
     memcpy(X1, U, (nX + 2)*sizeof(double));
 
@@ -96,7 +92,7 @@ int main() {
     memcpy(U, X1, (nX + 2)*sizeof(double));
 
   }
-  printf("COUNT - %d\n", count);
+
 
   double t1 = omp_get_wtime();
   printf("\nfinish!\n\n");
@@ -106,15 +102,19 @@ int main() {
   //------------------------------------------------------------------------
 
   double diffTime = t1 - t0;
-//  double gflop = (2*3*nX + 2*2)*sizeTime*1.0/1000000000.0;
-  printf("Time\t%.15lf\n", diffTime);
+  double gflop = (2*2*nX)*count*sizeTime*1.0/1000000000.0;
+
+  printf("EPS\t%.le\n", EPS);
+  printf("COUNT\t%d\n", count);
+  printf("TIME\t%.15lf\n", diffTime);
 //  printf("GFlop\t%.lf\n", gflop);
 //  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
   final(U);
 
   free(U);
-  free(UNext);
+  free(X1);
+  free(X2);
 
   freeSpMat(&A);
   return 0;
