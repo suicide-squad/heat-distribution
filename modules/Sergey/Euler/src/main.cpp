@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
     fscanf(infile, "dt=%lf\n", &dt);            // delta of time difference
     fscanf(infile, "BC=%d\n", &bc);         // Not using right now
 
-    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %.10lf;\n",
-           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+//    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %.10lf;\n",
+//           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
     double** vect = new double*[2];
     vect[0] = new double[nX + 2];
@@ -67,7 +67,6 @@ int main(int argc, char** argv) {
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
 
-    double expr = (sigma * dt) / (step * step);
     double timesize = (tFinal - tStart) / dt;
     double timedt = 1 / timesize;
 
@@ -77,7 +76,11 @@ int main(int argc, char** argv) {
         timesize = pow(2, atof(argv[1]));
         consoleInput = argv[1];
     }
-    printf("%.6lf\n", 1/timesize);
+    printf("1/timesize:\t %.10lf\n", 1/timesize);
+    printf("timesize:\t %.0f\n", timesize);
+    printf("dt:\t\t %.2e\n", 1/timesize * (tFinal - tStart));
+
+    double expr = (sigma * 1/timesize * (tFinal - tStart)) / (step * step);
 
     for (double j = 0; j < timesize; j += 1) {
 
@@ -99,7 +102,7 @@ int main(int argc, char** argv) {
     }
 
     time_E = omp_get_wtime();
-    printf("Run time %.15lf\n", time_E-time_S);
+    printf("Run time:\t %.15lf\n", time_E-time_S);
 
     string outfilename = "OUTPUT_" + consoleInput + ".txt";
     FILE *outfile = fopen(outfilename.c_str(), "w");
