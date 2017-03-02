@@ -8,6 +8,9 @@ using std::string;
 
 int main(int argc, char** argv) {
 
+    
+
+
     // Timing variables
     double time_S, time_E;  // Time for allocate memory
 
@@ -46,6 +49,12 @@ int main(int argc, char** argv) {
 
     printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+
+    if (argv[1] != 0) {
+        dt = atof(argv[1]);
+    }
+
+    printf("%s = %.15lf\n", argv[1], dt);
 
     double** vect = new double*[2];
     vect[0] = new double[nX + 2];
