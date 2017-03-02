@@ -8,9 +8,6 @@ using std::string;
 
 int main(int argc, char** argv) {
 
-    
-
-
     // Timing variables
     double time_S, time_E;  // Time for allocate memory
 
@@ -50,8 +47,10 @@ int main(int argc, char** argv) {
     printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
+    string consoleInput = "";
     if (argv[1] != 0) {
-        dt = atof(argv[1]);
+        dt *= atof(argv[1]);
+        consoleInput = (dt);
     }
 
     printf("%s = %.15lf\n", argv[1], dt);
@@ -79,7 +78,7 @@ int main(int argc, char** argv) {
     double expr = (sigma * dt) / (step * step);
     for (double j = 0; j < tFinal; j += dt) {
 
-        omp_set_num_threads(2);
+        omp_set_num_threads(4);
         {
             #pragma omp parallel for if (ENABLE_PARALLEL)
             for (int i = 1; i <= nX; i++) {
@@ -99,7 +98,8 @@ int main(int argc, char** argv) {
     time_E = omp_get_wtime();
     printf("Run time %.15lf\n", time_E-time_S);
 
-    FILE *outfile = fopen("OUTPUT.txt", "w");
+    string outfilename = "OUTPUT_" + consoleInput + ".txt";
+    FILE *outfile = fopen(outfilename.c_str(), "w");
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
