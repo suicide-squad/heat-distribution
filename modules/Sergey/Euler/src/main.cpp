@@ -44,16 +44,8 @@ int main(int argc, char** argv) {
     fscanf(infile, "dt=%lf\n", &dt);            // delta of time difference
     fscanf(infile, "BC=%d\n", &bc);         // Not using right now
 
-    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
+    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %.10lf;\n",
            xStart, xEnd, sigma, nX, tStart, tFinal, dt);
-
-    string consoleInput = "";
-    if (argv[1] != 0) {
-        dt *= atof(argv[1]);
-        consoleInput = (dt);
-    }
-
-    printf("%s = %.15lf\n", argv[1], dt);
 
     double** vect = new double*[2];
     vect[0] = new double[nX + 2];
@@ -76,7 +68,18 @@ int main(int argc, char** argv) {
     vect[0][nX+1] = vect[0][nX];
 
     double expr = (sigma * dt) / (step * step);
-    for (double j = 0; j < tFinal; j += dt) {
+    double timesize = (tFinal - tStart) / dt;
+    double timedt = 1 / timesize;
+
+    //printf("%.6lf\n", timedt);
+    string consoleInput = "";
+    if (argv[1] != 0) {
+        timesize = pow(2, atof(argv[1]));
+        consoleInput = argv[1];
+    }
+    printf("%.6lf\n", 1/timesize);
+
+    for (double j = 0; j < timesize; j += 1) {
 
         omp_set_num_threads(4);
         {
