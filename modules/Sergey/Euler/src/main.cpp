@@ -1,10 +1,17 @@
 #include <iostream>
+#include <omp.h>
 #include <cmath>
+
+const int ENABLE_PARALLEL = 1;
 
 using std::string;
 
 int main(int argc, char** argv) {
-    string filename = "INPUT.txt";
+
+    // Timing variables
+    double time_S, time_E;  // Time for allocate memory
+
+    string filename = "../../../../../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -50,6 +57,8 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
+    time_S = omp_get_wtime();
+
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
 
     prevTime = 0;
@@ -58,14 +67,17 @@ int main(int argc, char** argv) {
     vect[0][0] = vect[0][1];
     vect[0][nX+1] = vect[0][nX];
 
-
+    double expr = (sigma * dt) / (step * step);
     for (double j = 0; j < tFinal; j += dt) {
-        for (int i = 1; i <= nX; i++) {
-            vect[currTime][i] = ((sigma * dt) / (step * step)) *
-                (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
-                + vect[prevTime][i];
-        }
 
+        omp_set_num_threads(2);
+        {
+            #pragma omp parallel for if (ENABLE_PARALLEL)
+            for (int i = 1; i <= nX; i++) {
+                vect[currTime][i] = expr * (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
+                                    + vect[prevTime][i];
+            }
+        }
         // boundary conditions
         vect[currTime][0] = vect[currTime][1];
         vect[currTime][nX+1] = vect[currTime][nX];
@@ -74,6 +86,9 @@ int main(int argc, char** argv) {
         currTime = (currTime + 1) % 2;
 
     }
+
+    time_E = omp_get_wtime();
+    printf("Run time %.15lf\n", time_E-time_S);
 
     FILE *outfile = fopen("OUTPUT.txt", "w");
 

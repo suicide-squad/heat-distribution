@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "crs.h"
+#include <math.h>
 
 int main() {
 
@@ -13,7 +14,7 @@ int main() {
     double tStart = 0.0, tFinal = 0.0;
     double dt = 0.0;
     int check = 0;
-    double *U = NULL;
+    volatile double *U = NULL;
     double stepp;
     int sizeTime = 0;
     int curTime, prevTime;
@@ -39,9 +40,9 @@ int main() {
     
     // Заполнение функции в нулевой момент времени
     for (int i = 1; i < nX + 1; i++) {
-        fscanf(fp, "%lf", &(U)[i]);
+        fscanf(fp, "%lf", &U[i]);
     }
-    (U)[0] = (U)[nX + 1] = 0.0;
+    U[0] = U[nX + 1] = 0.0;
 
     fclose(fp);
     printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n", xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
@@ -58,7 +59,7 @@ int main() {
     //создание матрицы
     CRSMatrix coeff;
     double h = dt*backstepp;
-    initCRSMartix(nX + 3, 3 * nX + 2, &coeff);
+    initCRSMartix(nX + 2, 3*nX + 2, &coeff);
     coeff.Value[0] = 1;
     for (int i = 1; i < 3*nX + 1; i += 3){
         coeff.Value[i] = h;
@@ -80,30 +81,33 @@ int main() {
     for (int i = 2; i < nX+2; i++)
         coeff.rowindex[i] = coeff.rowindex[i - 1] + 3;
     coeff.rowindex[nX + 2] = coeff.rowindex[nX + 1] + 1;
-    
+    printf("%d", sizeTime);
     //вычисления
     double* Unext = (double*)malloc(sizeof(double) * (nX + 2));
-    double *tmp;
+    double* tmp;
     for (int i = 1; i <= sizeTime; i++) {
         multCRSMatrix(&Unext, coeff, U);
         tmp = U;
         U = Unext;
         Unext = tmp;
+        
+   
     }
-    printf("12\n");
+    
     fp = 0;
     fp = fopen("C:\\Users\\ролд\\Desktop\\heat-distribution\\result\\svetaEulerCRS.txt", "w");
 
 
     if (!fp)
         return -1;
-    printf("12\n");
+   
 
     for (int x = 1; x < nX + 1; x++)
         fprintf(fp, "%.15le\n", U[x]);
-    printf("12\n");
+    printf("vse");
 
     fclose(fp);
+    
     free(Unext);
     return 0;
 }

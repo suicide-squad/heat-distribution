@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(Euler)
+project(RungeKutt)
 
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
@@ -8,8 +8,5 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES
-    src/main.cpp
-    ../../../initial/INPUT.txt)
-
-add_executable(heat_distribution_lenf ${SOURCE_FILES})
+set(SOURCE_FILES src/main.cpp)
+add_executable(RungeKutt ${SOURCE_FILES})
