@@ -142,7 +142,7 @@ ____________________________________________________________________________
 
 int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tFinal, double *dt, int *check, TYPE **U) {
   FILE *fp;
-  if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
+  if ((fp = fopen("./../../../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     return -2;
   };
