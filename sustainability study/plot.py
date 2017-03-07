@@ -14,12 +14,12 @@ def fault(file1, file2):
     return absoluteFault
 
 directory = os.path.abspath(os.path.join(os.path.dirname(__file__),
-									"KEKUREKUS", "Runge–Kutt"))
+									"KEKUREKUS", "Jakobi_Euler"))
 
-fileDefault = os.path.join(directory, "OUTPUT_Runge.txt")
+fileDefault = os.path.join(directory, "OUTPUT_JACOBI_.txt")
 
 files = [os.path.join(directory, file) for file in os.listdir(directory)
-         if file[-4:] == '.txt' and file != "OUTPUT.txt" and file != "OUTPUT_Runge.txt"]
+         if file[-4:] == '.txt' and file != "OUTPUT.txt" and file != "OUTPUT_JACOBI_.txt"]
 
 print(files)
 number = re.compile(r'\d+')
@@ -27,8 +27,6 @@ numbers = [int(number.findall(file)[0]) for file in files]
 
 absoluteFaults = [fault(file, fileDefault) for file in files]
 
-x = zip(numbers, absoluteFaults)
-print(list(x))
 #####################################################################
 #                    Рисование графика                              #
 #####################################################################
