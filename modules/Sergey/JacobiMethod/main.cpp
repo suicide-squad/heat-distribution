@@ -20,7 +20,7 @@ double norm2Vect(double *&vect1, double *&vect2, int size) {
     return norm;
 }
 
-int main() {
+int main(int argc, char** argv) {
 
 
     // Timing variables
@@ -64,8 +64,21 @@ int main() {
     fscanf(infile, "dt=%lf\n", &dt);            // delta of time difference
     fscanf(infile, "BC=%d\n", &bc);         // Not using right now
 
-    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
-           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+//    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
+//           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+
+    double timesize = (tFinal - tStart) / dt;
+    //printf("%.6lf\n", timedt);
+    string consoleInput = "";
+    if (argv[1] != 0) {
+        timesize = pow(2, atof(argv[1]));
+        consoleInput = argv[1];
+    }
+
+    printf("1/timesize:\t %.10lf\n", 1/timesize);
+    printf("timesize:\t %.0f\n", timesize);
+    printf("dt:\t\t %.2e\n", 1/timesize * (tFinal - tStart));
+    dt = 1/double(timesize) * (tFinal - tStart);
 
     //  Memory allocation
 
@@ -102,10 +115,6 @@ int main() {
     double expr2 = 0;
     fillMatrix2Expr(spMatrix, nX + 2, expr1, expr2);
 
-    std::cout << expr1 << std::endl;
-    std::cout << expr2 << std::endl;
-    std::cout << expr3 << std::endl;
-
     // x1 = ax0 + b
     prevTime = 0;
     currTime = 1;
@@ -119,8 +128,10 @@ int main() {
 
     double* vis_vect = new double[nX + 2];
 
+    //double timesize = (tFinal - tStart) / dt;
 
-    for (double j = 0; j < tFinal; j += dt) {
+
+    for (double j = 0; j < timesize; j += 1) {
         for (int i = 0; i < nX + 2; i++) {
 //            vis_vect[i] = vect[prevTime][i];
             const_vect[i] = vect[prevTime][i] * expr3 ;
@@ -144,16 +155,17 @@ int main() {
 //            std::cout << "====" ><< j << std::endl;
             iterationCounter++;
         } while (norm2Vect(vect[prevTime], vect[currTime], nX + 2) > eps);  // vect[prevTime] = k + 1 now
-        if (iCOUNT % 100 == 0)
-            printf("time %lf, iterations %d\n", j, iterationCounter);
-        iCOUNT++;
+//        if (iCOUNT % 100 == 0)
+//            printf("time %lf, iterations %d\n", j, iterationCounter);
+//        iCOUNT++;
     }
     time_E = omp_get_wtime();
     printf("Run time %.15lf\n", time_E-time_S);
 
 
     // Output
-    FILE *outfile = fopen("OUTPUT.txt", "w");
+    string outfilename = "OUTPUT_JACOBI_" + consoleInput + ".txt";
+    FILE *outfile = fopen(outfilename.c_str(), "w");
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }

@@ -68,7 +68,6 @@ int main(int argc, char** argv) {
     vect[0][nX+1] = vect[0][nX];
 
     double timesize = (tFinal - tStart) / dt;
-    double timedt = 1 / timesize;
 
     //printf("%.6lf\n", timedt);
     string consoleInput = "";
