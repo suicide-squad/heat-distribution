@@ -27,6 +27,9 @@ if(OPENMP_FOUND)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 endif()
 
+# math
+find_library( M_LIB m )
+
 add_definitions(${CMAKE_CXX_FLAGS})
 add_definitions(${CMAKE_C_FLAGS})
 

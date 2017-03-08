@@ -17,11 +17,11 @@ int init(double *, double *, double *, double *, double *, double *, int *, TYPE
 void createSpMat(spMatrix *, TYPE);
 bool dist(double *, double *, size_t N);
 
-void final(TYPE *);
+void final(TYPE *, char patch[]);
 
 size_t nX;
 
-int main() {
+int main(int argc, char** argv) {
   double xStart, xEnd;
   double sigma;
   double tStart, tFinal;
@@ -39,6 +39,12 @@ int main() {
 
   double step = fabs(xStart - xEnd) / nX;
   size_t sizeTime = (size_t)((tFinal - tStart) / dt);
+  char consoleInput[80] = "";
+//  Версия для нахождения устойчивости
+  if (argc > 1) {
+    sizeTime = (size_t)pow(2, atof(argv[1]));
+    strcpy(consoleInput, argv[1]);
+  }
 
   #if ENABLE_PARALLEL
     printf("ПАРАЛЛЕЛЬНАЯ ВЕРСИЯ!\n");
@@ -74,8 +80,8 @@ int main() {
     do {
       multMV(&X2, A, X1);
 
-      for (int i = 1; i < nX + 1; i++) {
-        X2[i] = (U[i] + X2[i])*k;
+      for (int j = 1; j < nX + 1; j++) {
+        X2[j] = (U[j] + X2[j])*k;
       }
 
       X2[0] = X2[1];
@@ -110,7 +116,10 @@ int main() {
 //  printf("GFlop\t%.lf\n", gflop);
 //  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  final(U);
+  char patch[80] = "OUTPUT_JACOBI_";
+  strcat(patch, consoleInput);
+  strcat(patch, ".txt");
+  final(U, patch);
 
   free(U);
   free(X1);
@@ -134,7 +143,7 @@ ____________________________________________________________________________
 
 int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tFinal, double *dt, int *check, TYPE **U) {
   FILE *fp;
-  if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
+  if ((fp = fopen("./../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     return -2;
   };
@@ -189,9 +198,9 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
   mat->rowIndex[size] = mat->rowIndex[size - 1];
 }
 
-void final(TYPE *UFin) {
+void final(TYPE *UFin, char patch[]) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillImplicitEulerSparse.txt", "w");
+  fp = fopen(patch, "w");
 
   for (int i = 1; i < nX + 1; i++)
     fprintf(fp, "%.15le\n", UFin[i]);

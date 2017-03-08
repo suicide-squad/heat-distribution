@@ -10,7 +10,7 @@
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
-void final(TYPE *);
+void final(TYPE *, char patch[]);
 
 size_t nX;
 
@@ -114,7 +114,7 @@ int main() {
   printf("GFlop\t%.lf\n", gflop);
   printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  final(U);
+  final(U, NULL);
 
   free(U);
   free(UNext);
@@ -195,7 +195,7 @@ void createSpMat(spMatrix *mat, TYPE coeff1, TYPE coeff2) {
   mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1];
 }
 
-void final(TYPE *UFin) {
+void final(TYPE *UFin, char patch[]) {
   FILE *fp;
   fp = fopen("./../../../../result/kirillRungeKuttaSparse.txt", "w");
 
