@@ -1,0 +1,150 @@
+20^1
+1/timesize:	 0.5000000000
+timesize:	 2
+dt:		 4.00e-03
+Run time 0.014770570000110
+
+20^2
+1/timesize:	 0.2500000000
+timesize:	 4
+dt:		 2.00e-03
+Run time 0.006679207002890
+
+20^3
+1/timesize:	 0.1250000000
+timesize:	 8
+dt:		 1.00e-03
+Run time 0.010002863000409
+
+20^4
+1/timesize:	 0.0625000000
+timesize:	 16
+dt:		 5.00e-04
+Run time 0.000485432999994
+
+20^5
+1/timesize:	 0.0312500000
+timesize:	 32
+dt:		 2.50e-04
+Run time 0.000638707002508
+
+20^6
+1/timesize:	 0.0156250000
+timesize:	 64
+dt:		 1.25e-04
+Run time 0.000917506000405
+
+20^7
+1/timesize:	 0.0078125000
+timesize:	 128
+dt:		 6.25e-05
+Run time 0.001642882001761
+
+20^8
+1/timesize:	 0.0039062500
+timesize:	 256
+dt:		 3.13e-05
+Run time 0.003731387998414
+
+20^9
+1/timesize:	 0.0019531250
+timesize:	 512
+dt:		 1.56e-05
+Run time 0.019654687999719
+
+20^10
+1/timesize:	 0.0009765625
+timesize:	 1024
+dt:		 7.81e-06
+Run time 0.021177992999583
+
+20^11
+1/timesize:	 0.0004882812
+timesize:	 2048
+dt:		 3.91e-06
+Run time 0.035661846999574
+
+20^12
+1/timesize:	 0.0002441406
+timesize:	 4096
+dt:		 1.95e-06
+Run time 0.079026971001440
+
+20^13
+1/timesize:	 0.0001220703
+timesize:	 8192
+dt:		 9.77e-07
+Run time 0.121021718998236
+
+20^14
+1/timesize:	 0.0000610352
+timesize:	 16384
+dt:		 4.88e-07
+Run time 0.238997387998097
+
+20^15
+1/timesize:	 0.0000305176
+timesize:	 32768
+dt:		 2.44e-07
+Run time 0.466437852999661
+
+20^16
+1/timesize:	 0.0000152588
+timesize:	 65536
+dt:		 1.22e-07
+Run time 0.809193232998950
+
+20^17
+1/timesize:	 0.0000076294
+timesize:	 131072
+dt:		 6.10e-08
+Run time 1.731742394000321
+
+20^18
+1/timesize:	 0.0000038147
+timesize:	 262144
+dt:		 3.05e-08
+Run time 4.677343063001899
+
+20^19
+1/timesize:	 0.0000019073
+timesize:	 524288
+dt:		 1.53e-08
+Run time 9.107146915001067
+
+20^20
+1/timesize:	 0.0000009537
+timesize:	 1048576
+dt:		 7.63e-09
+Run time 17.141886829002033
+
+20^21
+1/timesize:	 0.0000004768
+timesize:	 2097152
+dt:		 3.81e-09
+Run time 31.757687762001297
+
+20^22
+1/timesize:	 0.0000002384
+timesize:	 4194304
+dt:		 1.91e-09
+Run time 54.951060594998125
+
+20^23
+1/timesize:	 0.0000001192
+timesize:	 8388608
+dt:		 9.54e-10
+Run time 101.046799367999483
+
+20^24
+1/timesize:	 0.0000000596
+timesize:	 16777216
+dt:		 4.77e-10
+Run time 202.461327823002648
+
+20^25
+1/timesize:	 0.0000000298
+timesize:	 33554432
+dt:		 2.38e-10
+Run time 433.892701101998682
+

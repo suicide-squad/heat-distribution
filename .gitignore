@@ -6,3 +6,5 @@ build/
 Debug/
 Release/
 .idea/
+cmake-build-release/
+cmake-build-debug/

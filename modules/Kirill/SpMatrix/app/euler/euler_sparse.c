@@ -9,7 +9,7 @@
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
-void final(TYPE *);
+void final(TYPE *, char patch[]);
 
 size_t nX;
 
@@ -105,7 +105,7 @@ ____________________________________________________________________________
 
 int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tFinal, double *dt, int *check, TYPE **U) {
   FILE *fp;
-  if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
+  if ((fp = fopen("./../../../../../../../initial/INPUT.txt", "r")) == NULL) {
     printf("Не могу найти файл!\n");
     return -2;
   };
@@ -160,7 +160,7 @@ void createSpMat(spMatrix *mat, TYPE coeff, TYPE coeff2) {
   mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 1;
 }
 
-void final(TYPE *UFin) {
+void final(TYPE *UFin, char patch[]) {
   FILE *fp;
   fp = fopen("./../../../../result/kirillEulerSparse.txt", "w");
 
