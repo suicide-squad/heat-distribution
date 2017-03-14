@@ -116,8 +116,12 @@ ___
 
 [Различные метрики](https://habrahabr.ru/post/101338/)
 
-____
-Света:
+___
+
+Света
+
+Характеристики компьютера:
+
 |           Item           |       Description      |
 |:------------------------:|:----------------------:|
 |     Processor number     |     Pentium N3520      |
@@ -127,4 +131,4 @@ ____
 |       Level 2 Cache      |         2028 KB        |
 |            OS            |    Windows 10 x64      |
 |         Compiler         |    Visual Studio c++   |
-
+---
