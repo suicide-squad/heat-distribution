@@ -115,3 +115,16 @@ ___
 Вывод финальных значений по начальным данным
 
 [Различные метрики](https://habrahabr.ru/post/101338/)
+
+____
+Света:
+|           Item           |       Description      |
+|:------------------------:|:----------------------:|
+|     Processor number     |     Pentium N3520      |
+|      Number of cores     |            4           |
+| Processor Base Frequency |        2.160 GHz       |
+|       Level 1 Cache      |          224 KB        |
+|       Level 2 Cache      |         2028 KB        |
+|            OS            |    Windows 10 x64      |
+|         Compiler         |    Visual Studio c++   |
+
