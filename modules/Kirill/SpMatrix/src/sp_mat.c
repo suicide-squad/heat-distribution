@@ -41,7 +41,7 @@ void sumV(size_t N, double h, TYPE **result, TYPE *U, TYPE *k1, TYPE *k2, TYPE *
 void printSpMat(spMatrix mat) {
   for (int i = 0; i < mat.nRows; i++) {
     for (int j = 0; j < mat.nRows; j++)
-      printf("%3.7lf\t", procedure(mat, i, j));
+      printf("%.0lf", procedure(mat, i, j));
     printf("\n");
   }
 }

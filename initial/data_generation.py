@@ -9,7 +9,7 @@ xStart = setting['XSTART']
 xFinish = setting['XEND']
 NX = setting['NX']
 
-step = (abs(xStart)+abs(xFinish))/NX
+step = (abs(xStart - xFinish))/NX
 
 massX = arange(xStart, xFinish, step, dtype = float)
 

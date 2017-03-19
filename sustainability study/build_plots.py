@@ -27,6 +27,7 @@ for method in methods:
 
     number = re.compile(r'\d+\.?\d*')
     numbers = [float(number.findall(file)[0]) for file in files]
+    # numbers = numbers[:-8]
 
     dic = dict(zip(numbers, files))
 
@@ -34,6 +35,8 @@ for method in methods:
 
     numbers.sort()
     files = [dic[i] for i in numbers]
+
+    # absoluteFaults = [abs(xi-xj)/max(xi, xj) for xi, xj in zip(array1, array2)]
 
     absoluteFaults = [fault(file, fileDefault) for file in files]
 
