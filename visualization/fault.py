@@ -68,7 +68,7 @@ try:
     ax = plt.gca()
     f = lambda x,y: '{:.15e}'.format(x)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x,y: '{:.0e}'.format(x)))
-    # plt.yscale('log')
+    plt.yscale('log')
 
     plt.subplot(222)
     plt.plot(x, yRelat, label = 'relative', color = 'red')

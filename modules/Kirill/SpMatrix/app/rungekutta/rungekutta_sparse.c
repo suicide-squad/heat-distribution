@@ -8,9 +8,12 @@
 
 #include "sp_mat.h"
 
+const char pathInput[]  = "../../../../../../initial/INPUT.txt";
+const char pathResult[] = "../../../../../../result/Kirill/RungeKutt.txt";
+
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
-void final(TYPE *);
+void final(TYPE *, const char *path);
 
 size_t nX;
 
@@ -114,7 +117,7 @@ int main() {
   printf("GFlop\t%.lf\n", gflop);
   printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
-  final(U);
+  final(U, pathResult);
 
   free(U);
   free(UNext);
@@ -142,7 +145,7 @@ ____________________________________________________________________________
 
 int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tFinal, double *dt, int *check, TYPE **U) {
   FILE *fp;
-  if ((fp = fopen("./../../../../initial/INPUT.txt", "r")) == NULL) {
+  if ((fp = fopen(pathInput, "r")) == NULL) {
     printf("Не могу найти файл!\n");
     return -2;
   };
@@ -178,26 +181,31 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
 
 void createSpMat(spMatrix *mat, TYPE coeff1, TYPE coeff2) {
 
-  initSpMat(mat, nX*3, nX + 3);
+  initSpMat(mat, (nX+2)*3, nX + 2);
 
   int j = 0;
-  for (int i = 0; i < 3*nX; i += 3) {
+  mat->value[0] = coeff1;  mat->col[0] = 0;
+  mat->value[1] = coeff2; mat->col[1] = 1;
+  mat->value[2] = coeff1;  mat->col[2] = 2;
+  for (int i = 3; i < (nX+2)*3 - 3; i += 3) {
     mat->value[i] = coeff1;       mat->col[i] = j++;
-    mat->value[i + 1] = coeff2;   mat->col[i + 1] = j++;
+    mat->value[i + 1] = coeff2;  mat->col[i + 1] = j++;
     mat->value[i + 2] = coeff1;   mat->col[i + 2] = j--;
   }
+  mat->value[(nX+2)*3 - 3] = coeff1;  mat->col[(nX+2)*3 - 3] = (int)nX - 1;
+  mat->value[(nX+2)*3 - 2] = coeff2; mat->col[(nX+2)*3 - 2] = (int)nX;
+  mat->value[(nX+2)*3 - 1] = coeff1;  mat->col[(nX+2)*3 - 1] = (int)nX + 1;
 
   mat->rowIndex[0] = 0;
-  mat->rowIndex[1] = 0;
-  for (int i = 2; i < nX + 2; i++) {
+  for (int i = 1; i < nX + 2; i++) {
     mat->rowIndex[i] = mat->rowIndex[i - 1] + 3;
   }
-  mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1];
+  mat->rowIndex[nX + 2] = mat->rowIndex[nX + 1] + 3;
 }
 
-void final(TYPE *UFin) {
+void final(TYPE *UFin, const char *path) {
   FILE *fp;
-  fp = fopen("./../../../../result/kirillRungeKuttaSparse.txt", "w");
+  fp = fopen(path, "w");
 
   for (int i = 1; i < nX + 1; i++)
     fprintf(fp, "%.15le\n", UFin[i]);

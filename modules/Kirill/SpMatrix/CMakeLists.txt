@@ -1,4 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
+
+#find_program(ICC_PATH  NAMES icc)
+#find_program(ICPC_PATH NAMES icpc)
+#message(${ICC_PATH})
+#message(${ICPC_PATH})
+#
+#if(${ICC_PATH} MATCHES ICC_PATH-NOTFOUND OR
+#        ${ICPC_PATH} MATCHES ICPC_PATH-NOTFOUND)
+#    message(STATUS "Cannot find Intel compiler. You may need to run `. /opt/intel/bin/compilervars.sh intel64'")
+#else()
+#
+#    set(CMAKE_C_COMPILER     ${ICC_PATH})
+#    set(CMAKE_CXX_COMPILER ${ICPC_PATH})
+#endif()
+
 project(SpMatrix)
 
 if (UNIX)
@@ -11,6 +26,9 @@ if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_C_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 endif()
+
+# math
+find_library( M_LIB m )
 
 add_definitions(${CMAKE_CXX_FLAGS})
 add_definitions(${CMAKE_C_FLAGS})
