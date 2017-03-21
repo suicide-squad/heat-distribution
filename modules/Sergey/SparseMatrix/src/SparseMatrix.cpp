@@ -31,9 +31,18 @@ void fillMatrix2Expr(SparseMatrix &sp, int size, double expr1, double expr2) {
     int index = 0;
     int pIndex = 0;
 
-    sp.values[index] = 1;
-    sp.columns[index] = 0;
-    sp.pointerB[pIndex++] = 0;
+    // boundaries
+    sp.values[index] = expr1;
+    sp.columns[index] = 1;
+    sp.pointerB[pIndex++] = index;
+    ++index;
+
+    sp.values[index] = expr2;
+    sp.columns[index] = 2;
+    ++index;
+
+    sp.values[index] = expr1;
+    sp.columns[index] = 3;
     ++index;
 
     for (int i = 1; i < size - 1; ++i) {
@@ -53,9 +62,19 @@ void fillMatrix2Expr(SparseMatrix &sp, int size, double expr1, double expr2) {
         ++index;
     }
 
-    sp.values[index] = 1;
-    sp.columns[index] = size - 1;
+    // boundaries
+    sp.values[index] = expr1;
+    sp.columns[index] = size - 3;
     sp.pointerB[pIndex++] = index;
+    ++index;
+
+    sp.values[index] = expr2;
+    sp.columns[index] = size - 2;
+    ++index;
+
+    sp.values[index] = expr1;
+    sp.columns[index] = size - 1;
+    ++index;
 
     sp.pointerB[pIndex] = index + 1;   //end
 }
