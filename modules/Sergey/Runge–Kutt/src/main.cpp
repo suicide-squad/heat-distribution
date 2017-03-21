@@ -69,13 +69,24 @@ int main(int argc, char** argv) {
 
     double expression = sigma / (step * step);
 
-    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
-           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
+//    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
+//           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
 
-    int timeStep = (int) ((tFinal - tStart) / dt);
-    double expr = dt / 2.0;
+    int timeSize = (int) ((tFinal - tStart) / dt);
 
-    for (double j = 0; j < timeStep; j += 1) {
+    string consoleInput = "";
+    if (argv[1] != 0) {
+        timeSize = pow(2, atof(argv[1]));
+        consoleInput = argv[1];
+    }
+    printf("1/timesize:\t %.10lf\n", double(1)/timeSize);
+    printf("timesize:\t %.0d\n", timeSize);
+    printf("dt:\t\t %.2e\n", double(1)/timeSize * (tFinal - tStart));
+
+    dt = 1/double(timeSize) * (tFinal - tStart);
+    double expr = 1/timeSize * (tFinal - tStart) / 2.0;
+
+    for (double j = 0; j < timeSize; j += 1) {
         omp_set_num_threads(4);
         // Fill k1 vect
         #pragma omp parallel for if (ENABLE_PARALLEL)
@@ -138,7 +149,8 @@ int main(int argc, char** argv) {
     time_E = omp_get_wtime();
     printf("Run time %.15lf\n", time_E-time_S);
 
-    FILE *outfile = fopen("OUTPUT_Runge.txt", "w");
+    string outfilename = "OUTPUT_Runge_" + consoleInput + ".txt";
+    FILE *outfile = fopen(outfilename.c_str(), "w");
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
