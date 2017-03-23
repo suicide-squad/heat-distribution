@@ -6,6 +6,9 @@
 #include "crs.h"
 #include <math.h>
 
+
+
+
 int main() {
 
     double xStart = 0.0, xEnd = 0.0;
@@ -81,18 +84,25 @@ int main() {
     for (int i = 2; i < nX+2; i++)
         coeff.rowindex[i] = coeff.rowindex[i - 1] + 3;
     coeff.rowindex[nX + 2] = coeff.rowindex[nX + 1] + 1;
-    printf("%d", sizeTime);
+    
     //вычисления
     double* Unext = (double*)malloc(sizeof(double) * (nX + 2));
     double* tmp;
+
+    double t0 = omp_get_wtime();
     for (int i = 1; i <= sizeTime; i++) {
         multCRSMatrix(&Unext, coeff, U);
         tmp = U;
         U = Unext;
         Unext = tmp;
-        
-   
     }
+    double t1 = omp_get_wtime();
+    double diffTime = t1 - t0;
+    
+
+    printf("Time\t%.15lf\n", diffTime);
+    
+    
     
     fp = 0;
     fp = fopen("C:\\Users\\ролд\\Desktop\\heat-distribution\\result\\svetaEulerCRS.txt", "w");
@@ -104,7 +114,7 @@ int main() {
 
     for (int x = 1; x < nX + 1; x++)
         fprintf(fp, "%.15le\n", U[x]);
-    printf("vse");
+
 
     fclose(fp);
     

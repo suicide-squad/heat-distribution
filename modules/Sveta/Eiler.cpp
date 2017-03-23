@@ -4,8 +4,9 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
+#include <omp.h>
 
-
+const int ENABLE_PARALLEL = 1;
 
 int main() {
     FILE *fp;
@@ -42,8 +43,7 @@ int main() {
 
     sizeTime = (int)((tFinal - tStart) / dt);
 
-    printf("%lf; %lf; %lf; %d; %lf; %lf; %lf; %d;\n", xStart, xEnd, sigma, nX, tStart, tFinal, dt, check);
-
+    
     for (i = 0; i < N; i++) {
         U[i] = (double *)malloc((nX + 2)*sizeof(double));
     }
@@ -73,16 +73,20 @@ int main() {
         // ???
         printf("HZ");
     }
-
+    printf("%d, %d;\n", sizeTime, nX);
+    double coef = dt*sigma*backstep;
     // Заполнение сетки
+    double t0 = omp_get_wtime();
     for (i = 1; i <= sizeTime; i++) {
         curTime = i%N;
         prevTime = (i + 1) % N;
+        omp_set_num_threads(4);
+        {
 
-        for (j = 1; j < nX + 2; j++)
-            U[curTime][j] = (dt*sigma * backstep)*(U[prevTime][j - 1] -
-            2 * U[prevTime][j] + U[prevTime][j + 1]) + U[prevTime][j];
-
+#pragma omp parallel for if (ENABLE_PARALLEL)
+            for (j = 1; j < nX + 1; j++)
+                U[curTime][j] = coef*(U[prevTime][j - 1] - 2 * U[prevTime][j] + U[prevTime][j + 1]) + U[prevTime][j];
+        }
         // Задание граничных условий
         if (check == 2) {
             U[curTime][0] = U[curTime][1];
@@ -90,13 +94,15 @@ int main() {
         }
         else if (check == 1) {
             // ???
-            printf("oj vse");
+            
         }
 
     }
+    double t1 = omp_get_wtime();
+    double diffTime = t1 - t0;
 
-    printf("finish!\n");
 
+    printf("Time\t%.15lf\n", diffTime);
     fp = fopen("C:\\Users\\ролд\\Documents\\Visual Studio 2013\\Projects\\Eiler\\Eiler\\svetaEuler.txt", "w");
 
     // Вывод результатов
@@ -106,9 +112,8 @@ int main() {
     fclose(fp);
 
     // Чистка мусора
-    for (i = 0; i < 2; i++) {
-        free(U[i]);
-    }
+    
+    
     free(U);
     return 0;
 }
