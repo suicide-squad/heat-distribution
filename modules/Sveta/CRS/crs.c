@@ -13,12 +13,21 @@ void freeCRSMatrix(CRSMatrix *crsm){
     free(crsm->rowindex);
 };
 void multCRSMatrix(double** result, CRSMatrix crsm, double* vec){
-    double sum = 0;
-    for (int i = 0; i < crsm.nRows; i++){
-        sum = 0;
-        for (int j = crsm.rowindex[i]; j < crsm.rowindex[i + 1]; j++){
-            sum += crsm.Value[j] * vec[crsm.col[j]];
+    double sum;
+    int i;
+#pragma omp parallel private(sum) num_threads(4) if (ENABLE_PARALLEL)
+    {
+#pragma omp for nowait
+        for (i = 0; i < crsm.nRows; i++){
+            sum = 0.0;
+            for (int j = crsm.rowindex[i]; j < crsm.rowindex[i + 1]; j++){
+                sum += crsm.Value[j] * vec[crsm.col[j]];
+            }
+            (*result)[i] = sum;
         }
-        (*result)[i] = sum;
     }
 }
+
+
+
+   
