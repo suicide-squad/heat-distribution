@@ -130,17 +130,21 @@ int main() {
 
 void createCRS(CRSMatrix *crsm, double coeff1, double coeff2){
     initCRSMartix(nX + 2, 3 * nX + 2, crsm);
-    crsm->Value[0] = 1;
-    for (int i = 1; i < 3 * nX + 1; i += 3){
+    crsm->Value[0] = coeff1;
+    crsm->Value[1] = coeff2;
+    crsm->Value[2] = coeff1;
+    for (int i = 3; i < 3 * nX + 1; i += 3){
         crsm->Value[i] = coeff1;
         crsm->Value[i + 1] = coeff2;
         crsm->Value[i + 2] = coeff1;
     }
     crsm->Value[3 * nX + 1] = 1;
     crsm->col[0] = 0;
+    crsm->col[1] = 1;
+    crsm->col[2] = 2;
     crsm->col[3 * nX + 1] = nX + 1;
     int j = 0;
-    for (int i = 1; i < 3 * nX + 1; i += 3){
+    for (int i = 3; i < 3 * nX + 1; i += 3){
         crsm->col[i] = j;
         crsm->col[i + 1] = j + 1;
         crsm->col[i + 2] = j + 2;
