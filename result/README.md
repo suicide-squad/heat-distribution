@@ -131,7 +131,7 @@ ___
 |       Level 2 Cache      |         2028 KB        |
 |            OS            |    Windows 10 x64      |
 |         Compiler         |    Visual Studio c++   |
-
+|          GFlops          |          6.78          |
 ---
 | # |    Название метода    | Threads       | Время | GFLOP | GFLOPS |
 |:-:|:---------------------:|---------------|-------|-------|--------|
