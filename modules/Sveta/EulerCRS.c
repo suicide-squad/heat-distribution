@@ -63,14 +63,19 @@ int main() {
     CRSMatrix coeff;
     double h = dt*backstepp;
     initCRSMartix(nX + 2, 3*nX + 2, &coeff);
-    coeff.Value[0] = 1;
-    for (int i = 1; i < 3*nX + 1; i += 3){
+    coeff.Value[0] = h;    
+    coeff.Value[1] = 1-2*h;
+    coeff.Value[2] = h;
+    for (int i = 3; i < 3*nX + 1; i += 3){
         coeff.Value[i] = h;
         coeff.Value[i + 1] = 1 - 2 * h;
         coeff.Value[i + 2] = h;
     }
     coeff.Value[3*nX + 1] = 1;
     coeff.col[0] = 0;
+    coeff.col[1] = 1;
+    coeff.col[2] = 2;
+
     coeff.col[3*nX + 1] = nX + 1;
     int j = 0;
     for (int i = 1; i < 3*nX + 1; i += 3){
