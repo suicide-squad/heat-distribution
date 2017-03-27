@@ -14,7 +14,7 @@
 const double EPS = 1e-10;
 
 const char pathInput[]  = "../../../../../../initial/INPUT.txt";
-const char pathResult[] = "../../../../../../result/Kirill/ImplicitEuler.txt";
+const char pathResult[] = "../../../../../../result/Kirill/implicit1D.txt";
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE);
@@ -186,7 +186,7 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
   }
 
   mat->rowIndex[0] = 0;
-  mat->rowIndex[1] = 3;
+  mat->rowIndex[1] = 0;
   for (int i = 2; i < size; i++) {
     mat->rowIndex[i] = mat->rowIndex[i - 1] + 2;
   }
