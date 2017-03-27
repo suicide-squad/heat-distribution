@@ -1,4 +1,4 @@
-from numpy import arange
+import numpy as np
 from math import cos, pi
 
 with open('INPUT.txt') as file:
@@ -6,19 +6,17 @@ with open('INPUT.txt') as file:
 	file.close()
 
 xStart = setting['XSTART']
-xFinish = setting['XEND']
+xEnd = setting['XEND']
 NX = setting['NX']
 
-step = (abs(xStart - xFinish))/NX
+X = np.linspace(xStart, xEnd, NX, dtype = float)
 
-massX = arange(xStart, xFinish, step, dtype = float)
+U = [cos(x*pi) if -0.5 < x < 0.5 else 0 for x in X]
 
-massY = [cos(x*pi) if -0.5 < x < 0.5 else 0 for x in massX]
-
-massY = list(map(str,massY))
-print (len(massY))
+U = list(map(str,U))
+print (len(U))
 
 with open('INPUT.txt', 'a') as file:
-	file.writelines('\n'.join(massY))
+	file.writelines('\n'.join(U))
 	file.close()
 	

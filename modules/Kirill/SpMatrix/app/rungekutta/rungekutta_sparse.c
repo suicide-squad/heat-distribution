@@ -9,7 +9,7 @@
 #include "sp_mat.h"
 
 const char pathInput[]  = "../../../../../../initial/INPUT.txt";
-const char pathResult[] = "../../../../../../result/Kirill/RungeKutt.txt";
+const char pathResult[] = "../../../../../../result/Kirill/runge1D.txt";
 
 int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE, TYPE);
