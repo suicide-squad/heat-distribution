@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 
+#define ENABLE_PARALLEL 1
 typedef struct {
     double* Value; //элементы матрицы
     int* col;//номера столбцов для ненулевых элементов

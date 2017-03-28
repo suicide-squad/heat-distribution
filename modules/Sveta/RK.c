@@ -4,17 +4,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
-<<<<<<< HEAD
-#include "omp.h"
-
-
-//#pragma openmp parallel for;
-=======
-
-
-
-
->>>>>>> 438e11c9cdbb9f3aa9522d1043039c0df1e0dddb
+#include <omp.h>
+#define ENABLE_PARALLEL 1
 
 int main() {
     FILE *fp;
@@ -85,42 +76,49 @@ int main() {
     else if (check == 1) {
         printf("wtf");
     }
-
+    double dt2 = 2.0*dt;
     double* k1 = (double *)malloc((nX + 2)*sizeof(double));
     double* k2 = (double *)malloc((nX + 2)*sizeof(double));
     double* k3 = (double *)malloc((nX + 2)*sizeof(double));
     double* k4 = (double *)malloc((nX + 2)*sizeof(double));
+    
+    double t0 = omp_get_wtime();
+
     for (int t = 1; t <= sizeTime; t++) {
+        omp_set_num_threads(4);
         curTime = t%N;
         prevTime = (t + 1) % N;
+        int x;
 
-
-    
-    for (int x = 1; x < nX + 1; x++){
+#pragma omp parallel for if (ENABLE_PARALLEL)
+    for (x = 1; x < nX + 1; x++){
         k1[x] = (U[prevTime][x - 1] - 2 * U[prevTime][x] + U[prevTime][x + 1])*backstep;
     }
     k1[0] = k1[1];
     k1[nX + 1] = k1[nX];
     
-    for (int x = 1; x < nX + 1; x++){
+#pragma omp parallel for if (ENABLE_PARALLEL)
+    for (x = 1; x < nX + 1; x++){
         k2[x] = (U[prevTime][x - 1] + k1[x - 1] * polh - 2 * U[prevTime][x] - k1[x] * dt + U[prevTime][x + 1] + k1[x + 1] * polh)*backstep;
     }
     k2[0] = k2[1];
     k2[nX + 1] = k2[nX];
-    
-    for (int x = 1; x < nX + 1; x++){
+
+#pragma omp parallel for if (ENABLE_PARALLEL)
+    for (x = 1; x < nX + 1; x++){
         k3[x] = (U[prevTime][x - 1] + k2[x - 1] * polh - 2 * U[prevTime][x] - k2[x] * dt + U[prevTime][x + 1] + k2[x + 1] * polh)*backstep;
     }
     k3[0] = k3[1];
     k3[nX + 1] = k3[nX];
-    
-    for (int x = 1; x < nX + 1; x++){
-        k4[x] = (U[prevTime][x - 1] + k3[x - 1] * dt - 2 * U[prevTime][x] - k3[x] * dt*2 + U[prevTime][x + 1] + k3[x + 1] * dt)*backstep;
+#pragma omp parallel for if (ENABLE_PARALLEL)
+    for (x = 1; x < nX + 1; x++){
+        k4[x] = (U[prevTime][x - 1] + k3[x - 1] * dt - 2 * U[prevTime][x] - k3[x] * dt2 + U[prevTime][x + 1] + k3[x + 1] * dt)*backstep;
     }
    
     k4[0] = k4[1];
     k4[nX + 1] = k4[nX];
-    for (int x = 1; x < nX + 1; x++){
+#pragma omp parallel for if (ENABLE_PARALLEL)
+    for (x = 1; x < nX + 1; x++){
         U[curTime][x] = U[prevTime][x] + h*(k1[x] + 2 * k2[x] + 2 * k3[x] + k4[x]);
     }
         //граничные условия
@@ -132,6 +130,11 @@ int main() {
             printf("wtf");
         }
     }
+    double t1 = omp_get_wtime();
+    double diffTime = t1 - t0;
+
+
+    printf("Time\t%.15lf\n", diffTime);
     printf("%d %d\n", sizeTime, nX);
     fp = 0;
         fp = fopen("C:\\Users\\ролд\\Desktop\\heat-distribution\\result\\svetaRungeKutta.txt", "w");

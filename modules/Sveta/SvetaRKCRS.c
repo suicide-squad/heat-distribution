@@ -1,10 +1,12 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "crs.h"
 #include <math.h>
+#include <omp.h>
 
 int nX;
 void createCRS(CRSMatrix *crsm, double coeff1, double coeff2);
@@ -80,20 +82,28 @@ int main() {
     double* tmp;
     double h = dt / 6.0;
     printf("start\n");
+
+    double t0 = omp_get_wtime();
     for (int i = 1; i <= sizeTime; i++) {
         multCRSMatrix(&k1, A, U);
         multCRSMatrix(&k2, B, k1);
         multCRSMatrix(&k3, B, k2);
         multCRSMatrix(&k4, C, k3);
+        int g;
 
-        for (int g = 0; g < nX + 2; g++)
-            Unext[g] = U[g] + h*(k1[g] + 2.0*k2[g] + 2.0*k3[g] + k4[g]);
-
+#pragma omp parallel for num_threads(4) if (ENABLE_PARALLEL)
+        for (g = 0; g < nX+2; g++)
+            Unext[g] = U[g] + h*(k1[g] + 2.0*k2[g] + 2.0*k3[g] + k4[g]);        
+            
+        
         tmp = U;
         U = Unext;
         Unext = tmp;
     }
-    printf("record\n");
+    double t1 = omp_get_wtime();
+    double diffTime = t1 - t0;
+    printf("Time\t%.15lf\n", diffTime);
+    
     fp = 0;
     fp = fopen("C:\\Users\\נמכה\\Desktop\\heat-distribution\\result\\svetaRungeSparse.txt", "w");
 
@@ -120,17 +130,21 @@ int main() {
 
 void createCRS(CRSMatrix *crsm, double coeff1, double coeff2){
     initCRSMartix(nX + 2, 3 * nX + 2, crsm);
-    crsm->Value[0] = 1;
-    for (int i = 1; i < 3 * nX + 1; i += 3){
+    crsm->Value[0] = coeff1;
+    crsm->Value[1] = coeff2;
+    crsm->Value[2] = coeff1;
+    for (int i = 3; i < 3 * nX + 1; i += 3){
         crsm->Value[i] = coeff1;
         crsm->Value[i + 1] = coeff2;
         crsm->Value[i + 2] = coeff1;
     }
     crsm->Value[3 * nX + 1] = 1;
     crsm->col[0] = 0;
+    crsm->col[1] = 1;
+    crsm->col[2] = 2;
     crsm->col[3 * nX + 1] = nX + 1;
     int j = 0;
-    for (int i = 1; i < 3 * nX + 1; i += 3){
+    for (int i = 3; i < 3 * nX + 1; i += 3){
         crsm->col[i] = j;
         crsm->col[i + 1] = j + 1;
         crsm->col[i + 2] = j + 2;

@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     // Sparse Matrix fill
 
     SparseMatrix matrix;
-    spMatrixInit(matrix, nX * 3 + 2, nX + 2);
+    spMatrixInit(matrix, (nX + 2) * 3, nX + 2);
     fillMatrix2Expr(matrix, nX+2, expression, expression2);
 
     // Calculating
