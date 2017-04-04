@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
 
     FILE *outfile;
     if (argv[1] != 0) {
-        string outfilename = "../result/Sergey/RungeTest/OUTPUT_Runge_" + consoleInput + ".txt";
+        string outfilename = "../result/Sergey/RungeTest/Runge_" + consoleInput + ".txt";
         outfile = fopen(outfilename.c_str(), "w");
     } else {
         string outfilename = "../result/Sergey/Sergey_Runge_Kutt1D.txt";
