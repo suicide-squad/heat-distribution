@@ -15,11 +15,12 @@ const char pathInput[]  = "../../../../../../initial/INPUT.txt";
 const char pathResult[] = "../../../../../../result/Kirill/euler1D_MPI.txt";
 
 int init(double *, double *, double *, size_t *nX, double *, double *, double *, int *, TYPE **);
-void createSpMat(spMatrix *, int nX, TYPE, TYPE);
+void createSpMat(spMatrix *, int nX, int reserve, TYPE, TYPE);
 void final(TYPE *, size_t nX, const char *path);
 
 
 int main(int argc, char **argv) {
+  double t0, t1;
   size_t nX, sizeTime;
 
   double step, dt;
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
 
   double coeff1 = dt/(step*step);
   double coeff2 = 1.0 - 2.0*coeff1;
-  createSpMat(&A, block, coeff1, coeff2);
+  createSpMat(&A, block, 0, coeff1, coeff2);
 
   // -----------------------------------------------------------------------
   //                              Вычисления
@@ -88,8 +89,7 @@ int main(int argc, char **argv) {
 
   TYPE* UrNext = (TYPE*)malloc(sizeof(TYPE) * (block + 2));
   TYPE* tmp;
-
-  double t0 = omp_get_wtime();
+  if (rankP == ROOT) t0 = omp_get_wtime();
   for (int i = 1; i <= sizeTime; i++) {
     // Передача соседям информацию о границах
     if (sizeP != 1) {
@@ -114,12 +114,12 @@ int main(int argc, char **argv) {
     Ur = UrNext;
     UrNext = tmp;
   }
+  if (rankP == ROOT) t1 = omp_get_wtime();
 
   //  Сбор информацию в итоговый массив
   MPI_Gather(Ur + 1, block, MPI_DOUBLE, U, block, MPI_DOUBLE, ROOT, MPI_COMM_WORLD);
 
   if (rankP == ROOT) {
-    double t1 = omp_get_wtime();
     printf("\nfinish!\n\n");
 
     //------------------------------------------------------------------------
@@ -148,9 +148,7 @@ int main(int argc, char **argv) {
 /*
 ____________________________________________________________________________
 
-
                           РЕАЛИЗАЦИЯ ФУНКЦИЙ
-
  ____________________________________________________________________________
 
 */
@@ -199,7 +197,7 @@ int init(double *xStart,
   return 0;
 }
 
-void createSpMat(spMatrix *mat, int nX, TYPE coeff, TYPE coeff2) {
+void createSpMat(spMatrix *mat, int nX, int reserve, TYPE coeff, TYPE coeff2) {
   int j = 0;
   mat->value[0] = coeff;  mat->col[0] = 0;
   mat->value[1] = coeff2; mat->col[1] = 1;

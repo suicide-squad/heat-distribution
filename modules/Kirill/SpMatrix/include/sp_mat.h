@@ -33,7 +33,7 @@ typedef struct {
   size_t nRows;     // Количество строк
 } spMatrix;
 
-void initSpMat(spMatrix* mat, size_t nz, size_t nRows);
+void initSpMat(spMatrix *mat, int nz, int nRows);
 void freeSpMat(spMatrix* mat);
 
 void multMV(TYPE** result, spMatrix matrix, TYPE* vector);
