@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 
 
     // Output
-    FILE *outfile = fopen("../../Sergey_Sparse_Runge1D.txt", "w");
+    FILE *outfile = fopen("../../result/Sergey/Sergey_Sparse_Runge1D.txt", "w");
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }
