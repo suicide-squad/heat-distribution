@@ -5,13 +5,18 @@
 #include <iostream>
 #include <omp.h>
 #include <cmath>
+#include <mpi.h>
 
-const int ENABLE_PARALLEL = 1;
+const int ENABLE_PARALLEL = 0;
 
 using std::string;
 
 int main(int argc, char** argv) {
+    /***
+     * Initial
+     */
 
+    const int ROOT = 0;
     // Timing variables
     double time_S, time_E;  // Time for allocate memory
 
@@ -61,6 +66,11 @@ int main(int argc, char** argv) {
     }
     fclose(infile);
 
+
+    /***
+     * Calculating
+     */
+
     time_S = omp_get_wtime();
 
     step = (fabs(xStart) + fabs(xEnd)) / nX;      // calculate step
@@ -79,11 +89,36 @@ int main(int argc, char** argv) {
 
     double expr = (sigma * 1/timesize * (tFinal - tStart)) / (step * step);
 
+
+    /***
+     * MPI Stuff
+     */
+    int sizeP, rankP;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &sizeP);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rankP);
+
+    // First scatter
+    if (rankP == ROOT) {
+        if (sizeP % 2 != 0 || sizeP == 1) {
+            perror("Process counter must be divided by 2 or equal 1");
+            exit(0);
+        }
+        // Calculate size of block for each process
+        int sizeblock = nX / sizeP;
+
+        // But we should send an two cell more each side
+        
+
+    }
+
+
     for (double j = 0; j < timesize; j += 1) {
 
         omp_set_num_threads(4);
         {
-#pragma omp parallel for if (ENABLE_PARALLEL)
+            #pragma omp parallel for if (ENABLE_PARALLEL)
             for (int i = 1; i <= nX; i++) {
                 vect[currTime][i] = expr * (vect[prevTime][i + 1] - 2 * vect[prevTime][i] + vect[prevTime][i - 1])
                                     + vect[prevTime][i];
@@ -109,4 +144,6 @@ int main(int argc, char** argv) {
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
     }
+
+    MPI_Finalize();
 }
