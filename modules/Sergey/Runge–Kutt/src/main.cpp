@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     // Timing variables
     double time_S, time_E;  // Time for allocate memory
 
-    string filename = "../../initial/INPUT.txt";
+    string filename = "../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -151,10 +151,10 @@ int main(int argc, char** argv) {
 
     FILE *outfile;
     if (argv[1] != 0) {
-        string outfilename = "../../result/Sergey/RungeTest/OUTPUT_Runge_" + consoleInput + ".txt";
+        string outfilename = "../result/Sergey/RungeTest/OUTPUT_Runge_" + consoleInput + ".txt";
         outfile = fopen(outfilename.c_str(), "w");
     } else {
-        string outfilename = "../../result/Sergey/Sergey_Runge_Kutt1D.txt";
+        string outfilename = "../result/Sergey/Sergey_Runge_Kutt1D.txt";
         outfile = fopen(outfilename.c_str(), "w");
 
     }

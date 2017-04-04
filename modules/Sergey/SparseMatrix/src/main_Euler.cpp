@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
     // File open
 
-    string filename = "../../initial/INPUT.txt";
+    string filename = "../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 
 
     // Output
-    FILE *outfile = fopen("../../result/Sergey/Sergey_Sparse_Euler1D.txt", "w");
+    FILE *outfile = fopen("../result/Sergey/Sergey_Sparse_Euler1D.txt", "w");
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);

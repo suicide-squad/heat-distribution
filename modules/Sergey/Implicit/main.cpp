@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 
     // File open
 
-    string filename = "../../../../initial/INPUT.txt";
+    string filename = "../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
     // Sparse Matrix fill
 
     SparseMatrix spMatrix;
-    spMatrixInit(spMatrix, nX*3 + 2, nX + 2);       // FIX
+    spMatrixInit(spMatrix, (nX + 2) * 3, nX + 2);
 
     double dopexprUp = (sigma * dt) / (step * step);
     double dopexprDw = 1 + 2 * dopexprUp;
@@ -146,9 +146,14 @@ int main(int argc, char** argv) {
 
 
     // Output
-    string outfilename = "OUTPUT_JACOBI_" + consoleInput + ".txt";
-    FILE *outfile = fopen(outfilename.c_str(), "w");
-
+    FILE *outfile;
+    if (argv[1] != 0) {
+        string outfilename = "../result/Sergey/ImplicitTest/Implicit_" + consoleInput + ".txt";
+        outfile = fopen(outfilename.c_str(), "w");
+    } else {
+        string outfilename = "../result/Sergey/Sergey_Implicit1D.txt";
+        outfile = fopen(outfilename.c_str(), "w");
+    }
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }
 
