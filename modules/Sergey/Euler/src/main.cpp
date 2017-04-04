@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     // Timing variables
     double time_S, time_E;  // Time for allocate memory
 
-    string filename = "../../../../../initial/INPUT.txt";
+    string filename = "../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -103,9 +103,14 @@ int main(int argc, char** argv) {
     time_E = omp_get_wtime();
     printf("Run time:\t %.15lf\n", time_E-time_S);
 
-    string outfilename = "OUTPUT_" + consoleInput + ".txt";
-    FILE *outfile = fopen(outfilename.c_str(), "w");
-
+    FILE *outfile;
+    if (argv[1] != 0) {
+        string outfilename = "../result/Sergey/EulerTest/Runge_" + consoleInput + ".txt";
+        outfile = fopen(outfilename.c_str(), "w");
+    } else {
+        string outfilename = "../result/Sergey/Sergey_Euler1D.txt";
+        outfile = fopen(outfilename.c_str(), "w");
+    }
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]);
     }

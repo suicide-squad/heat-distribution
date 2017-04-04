@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 
     // File open
 
-    string filename = "../../../../initial/INPUT.txt";
+    string filename = "../initial/INPUT.txt";
     FILE *infile = fopen(filename.c_str(), "r");
 
     if (infile == NULL) {
@@ -64,11 +64,7 @@ int main(int argc, char** argv) {
     fscanf(infile, "dt=%lf\n", &dt);            // delta of time difference
     fscanf(infile, "BC=%d\n", &bc);         // Not using right now
 
-//    printf("xStart %lf; xEnd %lf; sigma %lf; nX %d; tStart %lf; tFinal %lf; dt %lf;\n",
-//           xStart, xEnd, sigma, nX, tStart, tFinal, dt);
-
     double timesize = (tFinal - tStart) / dt;
-    //printf("%.6lf\n", timedt);
     string consoleInput = "";
     if (argv[1] != 0) {
         timesize = pow(2, atof(argv[1]));
@@ -103,9 +99,8 @@ int main(int argc, char** argv) {
     // Sparse Matrix fill
 
     SparseMatrix spMatrix;
-    spMatrixInit(spMatrix, nX*3 + 2, nX + 2);
-//    double expr1 = -sigma * dt / (step * step);
-//    double expr2 = 1 + 2 * (sigma * dt / (step * step));
+    spMatrixInit(spMatrix, (nX + 2) * 3, nX + 2);
+
     double dopexprUp = (sigma * dt) / (step * step);
     double dopexprDw = 1 + 2 * dopexprUp;
     double expr1 = dopexprUp / dopexprDw;
@@ -128,15 +123,9 @@ int main(int argc, char** argv) {
 
     double* vis_vect = new double[nX + 2];
 
-    //double timesize = (tFinal - tStart) / dt;
-
-
     for (double j = 0; j < timesize; j += 1) {
         for (int i = 0; i < nX + 2; i++) {
-//            vis_vect[i] = vect[prevTime][i];
             const_vect[i] = vect[prevTime][i] * expr3 ;
-//            vect[prevTime][i] = 1;
-//            std::cout << const_vect[i] << std::endl;
         }
 
         int iterationCounter = 0;
@@ -149,24 +138,22 @@ int main(int argc, char** argv) {
             prevTime = (prevTime + 1) % 2;
             currTime = (currTime + 1) % 2;
 
-//            if (iCOUNT % 1 == 0)
-//               std::cout << norm2Vect(vis_vect, vect[currTime], nX + 2) << "======"  << j << std::endl;
-//            iCOUNT++;
-//            std::cout << "====" ><< j << std::endl;
             iterationCounter++;
         } while (norm2Vect(vect[prevTime], vect[currTime], nX + 2) > eps);  // vect[prevTime] = k + 1 now
-//        if (iCOUNT % 100 == 0)
-//            printf("time %lf, iterations %d\n", j, iterationCounter);
-//        iCOUNT++;
     }
     time_E = omp_get_wtime();
     printf("Run time %.15lf\n", time_E-time_S);
 
 
     // Output
-    string outfilename = "OUTPUT_JACOBI_" + consoleInput + ".txt";
-    FILE *outfile = fopen(outfilename.c_str(), "w");
-
+    FILE *outfile;
+    if (argv[1] != 0) {
+        string outfilename = "../result/Sergey/ImplicitTest/Implicit_" + consoleInput + ".txt";
+        outfile = fopen(outfilename.c_str(), "w");
+    } else {
+        string outfilename = "../result/Sergey/Sergey_Implicit1D.txt";
+        outfile = fopen(outfilename.c_str(), "w");
+    }
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }
 

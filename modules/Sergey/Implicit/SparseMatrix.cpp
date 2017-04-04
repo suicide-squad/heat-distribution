@@ -31,31 +31,38 @@ void fillMatrix2Expr(SparseMatrix &sp, int size, double expr1, double expr2) {
     int index = 0;
     int pIndex = 0;
 
-    sp.values[index] = 1;
-    sp.columns[index] = 0;
-    sp.pointerB[pIndex++] = 0;
-    ++index;
+    /** Boundaries rule
+     *  If we on the edge, we should use same expression (line with parametrs), as the line after.
+     *  If it's first line the pattern for her is line two. (+1)
+     *  If it's last line, pattern - previous line.         (-1)
+     *  Realization - fixes value, whose start to work, if we on the boundaries, joins @var x
+     *  @var fixBounds
+     */
 
-    for (int i = 1; i < size - 1; ++i) {
+    int fixBounds = 0;
 
+    for (int i = 0; i < size; ++i) {
+        if (i == 0 ) {
+            fixBounds = 1;
+        } else if ((i + 1) == size) {
+            fixBounds = -1;
+        }
         //printf("index %d \n", index);
         sp.values[index] = expr1;
-        sp.columns[index] = i - 1;
+        sp.columns[index] = fixBounds + i - 1;
         sp.pointerB[pIndex++] = index;
         ++index;
 
         sp.values[index] = expr2;
-        sp.columns[index] = i;
+        sp.columns[index] = fixBounds + i;
         ++index;
 
         sp.values[index] = expr1;
-        sp.columns[index] = i + 1;
+        sp.columns[index] = fixBounds + i + 1;
         ++index;
-    }
 
-    sp.values[index] = 1;
-    sp.columns[index] = size - 1;
-    sp.pointerB[pIndex++] = index;
+        fixBounds = 0;
+    }
 
     sp.pointerB[pIndex] = index + 1;   //end
 }
