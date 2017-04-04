@@ -86,26 +86,26 @@ int main(int argc, char** argv) {
 
 
     SparseMatrix sm_k1;
-    spMatrixInit(sm_k1, nX * 3 + 2, nX + 2);
+    spMatrixInit(sm_k1, (nX + 2) * 3, nX + 2);
     double expression1 = sigma / (step * step);
     double expression2 = -2.0 * expression1;
     fillMatrix2Expr(sm_k1, nX + 2, expression1, expression2);
 
     // KURWA
     SparseMatrix sm_k2;
-    spMatrixInit(sm_k2, nX * 3 + 2, nX + 2);
+    spMatrixInit(sm_k2, (nX + 2) * 3, nX + 2);
     double k2expr1 = dt * expression1 * 0.5;
     double k2expr2 = 1 - 2.0 * k2expr1;
     fillMatrix2Expr(sm_k2, nX+2, k2expr1, k2expr2);
 
     SparseMatrix sm_k3;
-    spMatrixInit(sm_k3, nX * 3 + 2, nX + 2);
+    spMatrixInit(sm_k3, (nX + 2) * 3, nX + 2);
     double k3expr1 = k2expr1;
     double k3expr2 = k2expr2;
     fillMatrix2Expr(sm_k3, nX+2, k3expr1, k3expr2);
 
     SparseMatrix sm_k4;
-    spMatrixInit(sm_k4, nX * 3 + 2, nX + 2);
+    spMatrixInit(sm_k4, (nX + 2) * 3, nX + 2);
     double k4expr1 = dt * expression1;
     double k4expr2 = 1 - 2.0 * k4expr1;
     fillMatrix2Expr(sm_k4, nX+2, k4expr1, k4expr2);
@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 
 
     // Output
-    FILE *outfile = fopen("OUTPUT.txt", "w");
+    FILE *outfile = fopen("Sergey_Sparse_Runge1D.txt", "w");
 
     for (int i = 1; i <= nX; i++) {
         fprintf(outfile, "%2.15le\n", vect[prevTime][i]); }
