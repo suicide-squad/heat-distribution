@@ -5,6 +5,7 @@ file(GLOB src_euler Euler.cpp)
 
 add_executable(${target} ${src_euler})
 target_link_libraries(${target} ${LIBRARY})
+target_link_libraries(${target} ${MPI_LIBRARIES})
 
 #set(target "${APP}_SparseMatrix_MPI_Euler")
 #
