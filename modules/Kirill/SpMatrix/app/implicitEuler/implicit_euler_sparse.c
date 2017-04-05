@@ -16,11 +16,11 @@ const double EPS = 1e-10;
 const char pathInput[]  = "../../../../../../initial/INPUT.txt";
 const char pathResult[] = "../../../../../../result/Kirill/implicit1D.txt";
 
-int init(double *, double *, double *, double *, double *, double *, int *, TYPE **);
+int init(double *, double *, double *, size_t *nX, double *, double *, double *, int *, TYPE **);
 void createSpMat(spMatrix *, TYPE);
 bool dist(double *, double *, size_t N);
 
-void final(TYPE *, const char *path);
+void final(TYPE *, size_t nX, const char *path);
 
 size_t nX;
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   //                      Инициализация данных
   //------------------------------------------------------------------------
 
-  if ( init(&xStart, &xEnd, &sigma, &tStart, &tFinal, &dt, &check, &U) )
+  if (init(&xStart, &xEnd, &sigma, 0, &tStart, &tFinal, &dt, &check, &U))
     return -1;
 
   double step = fabs(xStart - xEnd) / nX;
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 //  printf("GFlop's\t%.15lf\n", gflop*1.0/diffTime);
 
 
-  final(U, pathResult);
+  final(U, 0, pathResult);
 
   free(U);
   free(X1);
@@ -136,7 +136,15 @@ ____________________________________________________________________________
 */
 
 
-int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tFinal, double *dt, int *check, TYPE **U) {
+int init(double *xStart,
+         double *xEnd,
+         double *sigma,
+         size_t *nX,
+         double *tStart,
+         double *tFinal,
+         double *dt,
+         int *check,
+         TYPE **U) {
   FILE *fp;
   if ((fp = fopen(pathInput, "r")) == NULL) {
     printf("Не могу найти файл!\n");
@@ -149,7 +157,7 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
     return -1;
   if ( !fscanf(fp, "SIGMA=%lf\n", sigma) )
     return -1;
-  if ( !fscanf(fp, "NX=%lu\n", &nX) )
+  if ( !fscanf(fp, "NX=%lu\n", nX) )
     return -1;
   if ( !fscanf(fp, "TSTART=%lf\n", tStart) )
     return -1;
@@ -160,13 +168,13 @@ int init(double *xStart, double *xEnd, double *sigma, double *tStart, double *tF
   if ( !fscanf(fp, "BC=%d\n", check) )
     return -1;
 
-  *U = (TYPE*)malloc(sizeof(TYPE) * (nX + 2));
+  *U = (TYPE*)malloc(sizeof(TYPE) * (*nX + 2));
 
   // Заполнение функции в нулевой момент времени
-  for (int i = 1; i < nX - 1; i++)
+  for (int i = 1; i < *nX - 1; i++)
     if ( !fscanf(fp, "%lf", &(*U)[i]) )
       return -1;
-  (*U)[0] = (*U)[nX + 1] = 0.0;
+  (*U)[0] = (*U)[*nX + 1] = 0.0;
   fclose(fp);
 
   return 0;
@@ -193,7 +201,7 @@ void createSpMat(spMatrix *mat, TYPE coeff) {
   mat->rowIndex[size] = mat->rowIndex[size - 1];
 }
 
-void final(TYPE *UFin, const char *path) {
+void final(TYPE *UFin, size_t nX, const char *path) {
   FILE *fp;
   fp = fopen(path, "w");
 

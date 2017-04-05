@@ -3,7 +3,7 @@
 
 #include "sp_mat.h"
 
-void initSpMat(spMatrix *mat, size_t nz, size_t nRows) {
+void initSpMat(spMatrix *mat, int nz, int nRows) {
   mat->nz = nz;
   mat->nRows = nRows;
   mat->value = (TYPE *)malloc(sizeof(TYPE) * nz);
