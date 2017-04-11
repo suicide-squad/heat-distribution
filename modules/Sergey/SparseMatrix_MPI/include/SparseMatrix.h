@@ -18,6 +18,7 @@ typedef struct SparseMatrix {
 } SpaceMatrix;
 
 void fillMatrix2Expr(SparseMatrix &sp, int size, double expr1, double expr2);
+void fillMatrix2ExprWithoutBoundaries(SparseMatrix &sp, int size, double expr1, double expr2);
 void multiplicateVector(SparseMatrix &sp, double *&vect, double *&result, int size);
 void spMatrixInit(SparseMatrix &sp, int size, int rows);
 void printVectors(SparseMatrix &sp);

@@ -87,3 +87,26 @@ void printVectors(SparseMatrix &sp) {
     }
     printf("\n");
 }
+
+void fillMatrix2ExprWithoutBoundaries(SparseMatrix &sp, int size, double expr1, double expr2) {
+    int index = 0;
+    int pIndex = 0;
+
+    for (int i = 0; i < size; ++i) {
+        //printf("index %d \n", index);
+        sp.values[index] = expr1;
+        sp.columns[index] = i - 1;
+        sp.pointerB[pIndex++] = index;
+        ++index;
+
+        sp.values[index] = expr2;
+        sp.columns[index] = i;
+        ++index;
+
+        sp.values[index] = expr1;
+        sp.columns[index] = i + 1;
+        ++index;
+    }
+
+    sp.pointerB[pIndex] = index + 1;   //end
+}
