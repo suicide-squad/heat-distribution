@@ -201,20 +201,20 @@ int main(int argc, char** argv) {
                     procVect[currTime][k] = vectLeftRecv[k];
                 }
             } else {
-                for (int k = 0; k < ADD_CELL; ++k) {
-                    vectRightSend[k] = procVect[currTime][block_size + k];
-                    vectLeftSend[k] = procVect[currTime][ADD_CELL + k];
-                }
-                MPI_Sendrecv(vectRightSend, ADD_CELL, MPI_DOUBLE, rankP + 1, 0,
-                             vectRightRecv, ADD_CELL, MPI_DOUBLE, rankP + 1, 0, MPI_COMM_WORLD, &status);
-                MPI_Sendrecv(vectLeftSend, ADD_CELL, MPI_DOUBLE, rankP - 1, 0,
-                             vectLeftRecv, ADD_CELL, MPI_DOUBLE, rankP - 1, 0, MPI_COMM_WORLD, &status);
-                for (int k = 0; k < ADD_CELL; ++k) {
-                    procVect[currTime][block_size+ADD_CELL+k] = vectRightRecv[k];
-                    procVect[currTime][k] = vectLeftRecv[k];
-                }
+            for (int k = 0; k < ADD_CELL; ++k) {
+                vectRightSend[k] = procVect[currTime][block_size + k];
+                vectLeftSend[k] = procVect[currTime][ADD_CELL + k];
             }
-            fuck_count = 0;
+            MPI_Sendrecv(vectRightSend, ADD_CELL, MPI_DOUBLE, rankP + 1, 0,
+                         vectRightRecv, ADD_CELL, MPI_DOUBLE, rankP + 1, 0, MPI_COMM_WORLD, &status);
+            MPI_Sendrecv(vectLeftSend, ADD_CELL, MPI_DOUBLE, rankP - 1, 0,
+                         vectLeftRecv, ADD_CELL, MPI_DOUBLE, rankP - 1, 0, MPI_COMM_WORLD, &status);
+            for (int k = 0; k < ADD_CELL; ++k) {
+                procVect[currTime][block_size+ADD_CELL+k] = vectRightRecv[k];
+                procVect[currTime][k] = vectLeftRecv[k];
+            }
+        }
+        fuck_count = 0;
         }
 
         fuck_count++;

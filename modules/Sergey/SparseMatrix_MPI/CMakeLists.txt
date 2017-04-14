@@ -1,21 +1,19 @@
-#include_directories(include)
-#
-#get_filename_component(UNDER_DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
-#
-#set(DIR_NAME "${DIR_NAME}_${UNDER_DIR_NAME}")
-#set(MODULE      "${DIR_NAME}")
-#set(APP         "app_${MODULE}")
-#set(LIBRARY     "lib_${MODULE}")
-#
-#add_subdirectory(src)
-#add_subdirectory(app)
+cmake_minimum_required(VERSION 3.6)
+#project(SparseMatrixMPI)
+set(target Sergey_SparseMatrix_MPI_Euler)
 
-set(target kekus)
-
-find_package( MPI REQUIRED )
+find_package(MPI REQUIRED)
 include_directories( ${MPI_INCLUDE_PATH} )
-include_directories(include)
 
-set(SOURCE_FILES app/Euler.cpp src/SparseMatrix.cpp include/SparseMatrix.h)
+find_package(OpenMP REQUIRED)
+if(OPENMP_FOUND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${OpenMP_C_FLAGS}")
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}    ${OpenMP_C_FLAGS}")
+endif()
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set(SOURCE_FILES main.cpp SparseMatrix.cpp SparseMatrix.h)
 add_executable(${target} ${SOURCE_FILES})
 target_link_libraries(${target} ${MPI_LIBRARIES})
